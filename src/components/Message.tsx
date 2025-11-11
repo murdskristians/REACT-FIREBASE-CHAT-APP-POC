@@ -1,13 +1,26 @@
 import React from 'react';
 import { formatRelative } from 'date-fns';
+import firebase from 'firebase/compat/app';
+
 import './Message.css';
 
-const Message = ({
+type MessageProps = {
+  createdAt?: firebase.firestore.Timestamp | null;
+  text?: string;
+  displayName?: string;
+  photoURL?: string;
+};
+
+const Message: React.FC<MessageProps> = ({
   createdAt = null,
   text = '',
   displayName = '',
   photoURL = '',
 }) => {
+  const timestamp = createdAt?.seconds
+    ? new Date(createdAt.seconds * 1000)
+    : null;
+
   return (
     <div className={`message ${!photoURL ? 'message-without-avatar' : ''}`}>
       {photoURL ? (
@@ -17,9 +30,9 @@ const Message = ({
         {displayName ? (
           <div className="message-header">
             <p className="message-name">{displayName}</p>
-            {createdAt?.seconds ? (
+            {timestamp ? (
               <span className="message-timestamp">
-                {formatRelative(new Date(createdAt.seconds * 1000), new Date())}
+                {formatRelative(timestamp, new Date())}
               </span>
             ) : null}
           </div>
