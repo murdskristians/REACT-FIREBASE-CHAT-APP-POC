@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import Button from './components/Button';
-import Channel from './components/Channel';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ResetPassword from './pages/auth/ResetPassword';
+import { Workspace } from './components/workspace/Workspace';
 
 import './App.css';
 
@@ -60,26 +59,7 @@ function App() {
         />
 
         {/* Protected routes */}
-        <Route
-          path="/"
-          element={
-            user ? (
-              <div className="app-container">
-                <div className="app-header">
-                  <h1>Welcome to chat</h1>
-                  <Button onClick={handleSignOut} className="header-sign-out-button">
-                    Sign out.
-                  </Button>
-                </div>
-                <div className="chat-container">
-                  <Channel user={user} />
-                </div>
-              </div>
-            ) : (
-              <Navigate to="/auth/login" replace />
-            )
-          }
-        />
+        <Route path="/" element={user ? <Workspace user={user} onSignOut={handleSignOut} /> : <Navigate to="/auth/login" replace />} />
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
