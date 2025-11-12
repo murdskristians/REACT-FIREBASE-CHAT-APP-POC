@@ -49,7 +49,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: end;
+  justify-content: center;
   background-color: #fff;
   border-radius: 16px;
   padding: 27px;
@@ -142,6 +142,53 @@
 
 .auth-footer a:hover {
   text-decoration: underline;
+}
+
+.auth-container-center {
+  width: 100%;
+  max-width: 444px;
+  margin: 0 auto;
+}
+
+.reset-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  width: 100%;
+}
+
+.reset-password-form .form-fields {
+  width: 100%;
+}
+
+.reset-password-form .auth-form-header h2 {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.reset-password-form .auth-form-header .subtitle {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.reset-password-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reset-password-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reset-password-buttons .auth-button.secondary {
+  margin-top: 0;
 }
 
 @media (max-width: 960px) {

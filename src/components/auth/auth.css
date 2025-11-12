@@ -97,7 +97,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #374151;
+}
+
+.password-toggle svg {
+  display: block;
 }
 
 .error-message {
@@ -116,6 +125,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.forgot-password {
+  font-size: 14px;
+  font-weight: 500;
+  color: #272727;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .remember-me {
@@ -198,6 +218,37 @@
 .social-auth-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Registration page specific overrides for compact layout */
+.auth-page .auth-form {
+  gap: 16px;
+}
+
+.auth-page .auth-form-header h2 {
+  font-size: 22px;
+}
+
+.auth-page .auth-form-header .subtitle {
+  font-size: 12px;
+  margin: 6px 0 0 0;
+}
+
+.auth-page .form-fields {
+  gap: 12px;
+}
+
+.auth-page .form-group {
+  gap: 4px;
+}
+
+.auth-page .form-group input {
+  padding: 8px 12px;
+}
+
+.auth-page .password-input-wrapper input {
+  padding: 8px 12px;
+  padding-right: 40px;
 }
 
 @media (max-width: 640px) {

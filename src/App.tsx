@@ -5,6 +5,7 @@ import Button from './components/Button';
 import Channel from './components/Channel';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import ResetPassword from './pages/auth/ResetPassword';
 
 import './App.css';
 
@@ -52,6 +53,10 @@ function App() {
         <Route
           path="/auth/register"
           element={user ? <Navigate to="/" replace /> : <Register />}
+        />
+        <Route
+          path="/auth/reset-password"
+          element={user ? <Navigate to="/" replace /> : <ResetPassword />}
         />
 
         {/* Protected routes */}
