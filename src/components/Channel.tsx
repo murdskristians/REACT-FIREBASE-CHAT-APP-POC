@@ -78,7 +78,7 @@ const Channel: React.FC<ChannelProps> = ({ user }) => {
           disabled={!newMessage.trim()}
           className="send-button"
         >
-          Send
+          Send 2
         </button>
       </form>
     </div>
