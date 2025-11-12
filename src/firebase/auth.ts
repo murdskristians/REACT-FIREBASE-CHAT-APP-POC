@@ -16,4 +16,16 @@ export const signInWithGoogle = async () => {
   return auth.signInWithPopup(provider);
 };
 
+export const signInWithEmailPassword = async (email: string, password: string) => {
+  return auth.signInWithEmailAndPassword(email, password);
+};
+
+export const signUpWithEmailPassword = async (email: string, password: string) => {
+  return auth.createUserWithEmailAndPassword(email, password);
+};
+
+export const resetPassword = async (email: string) => {
+  return auth.sendPasswordResetEmail(email);
+};
+
 export const signOut = () => auth.signOut();
