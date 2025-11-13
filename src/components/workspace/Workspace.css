@@ -17,6 +17,20 @@
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+.workspace__profile-view {
+  grid-column: 2 / 5;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  background: transparent;
+  overflow: hidden;
+}
+
+.workspace__profile-view > * {
+  flex: 1;
+  display: flex;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
