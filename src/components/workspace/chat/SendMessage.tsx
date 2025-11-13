@@ -1,4 +1,6 @@
+import clsx from 'clsx';
 import type { FC, MouseEventHandler } from 'react';
+import { PuiBox } from 'piche.ui';
 import { SendDisabled, SendGradient } from 'piche.ui';
 
 interface SendMessageProps {
@@ -8,11 +10,11 @@ interface SendMessageProps {
 
 export const SendMessage: FC<SendMessageProps> = ({ handleSend, disabled }) => {
   return (
-    <div
+    <PuiBox
       onClick={handleSend}
-      className={`chat-panel__composer-send${disabled ? ' disabled' : ''}`}
+      className={clsx('chat-panel__composer-send', { disabled })}
     >
       {disabled ? <SendDisabled /> : <SendGradient />}
-    </div>
+    </PuiBox>
   );
 };
