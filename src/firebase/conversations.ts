@@ -29,6 +29,8 @@ export type ConversationMessage = {
   id: string;
   senderId: string;
   senderName?: string | null;
+  senderAvatarUrl?: string | null;
+  senderAvatarColor?: string | null;
   text?: string | null;
   imageUrl?: string | null;
   type: 'text' | 'image';
@@ -83,6 +85,8 @@ export function subscribeToConversationMessages(
           id: doc.id,
           senderId: data.senderId,
           senderName: data.senderName ?? null,
+          senderAvatarUrl: data.senderAvatarUrl ?? null,
+          senderAvatarColor: data.senderAvatarColor ?? null,
           text: data.text ?? null,
           imageUrl: data.imageUrl ?? null,
           type: data.type ?? 'text',
@@ -98,6 +102,8 @@ type SendMessageOptions = {
   conversationId: string;
   senderId: string;
   senderName?: string | null;
+  senderAvatarUrl?: string | null;
+  senderAvatarColor?: string | null;
   text?: string;
   file?: File | null;
 };
@@ -106,6 +112,8 @@ export async function sendMessage({
   conversationId,
   senderId,
   senderName,
+  senderAvatarUrl,
+  senderAvatarColor,
   text,
   file,
 }: SendMessageOptions): Promise<void> {
@@ -127,6 +135,8 @@ export async function sendMessage({
   await messageRef.set({
     senderId,
     senderName: senderName ?? null,
+    senderAvatarUrl: senderAvatarUrl ?? null,
+    senderAvatarColor: senderAvatarColor ?? null,
     text: trimmedText ?? null,
     imageUrl: uploadedImageUrl ?? null,
     type: messageType,

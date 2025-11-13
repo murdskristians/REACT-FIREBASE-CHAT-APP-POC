@@ -10,6 +10,7 @@ interface MessageCardProps {
   sequenceStarted: boolean;
   senderName?: string;
   senderAvatar?: string;
+  senderAvatarColor?: string;
   isGroup?: boolean;
 }
 
@@ -18,6 +19,8 @@ export const MessageCard: FC<MessageCardProps> = ({
   isUserMessage,
   sequenceStarted,
   senderName,
+  senderAvatar,
+  senderAvatarColor,
   isGroup = false,
 }) => {
   const time = new Date(message?.createdAt?.toDate() ?? '').toLocaleTimeString('en-GB', {
@@ -46,7 +49,7 @@ export const MessageCard: FC<MessageCardProps> = ({
           width: '100%',
         }}
       >
-        {/* Avatar placeholder for non-user messages */}
+        {/* Avatar for non-user messages */}
         {!isUserMessage && (
           <PuiStack
             sx={{
@@ -54,8 +57,29 @@ export const MessageCard: FC<MessageCardProps> = ({
               height: '32px',
               flexShrink: 0,
               visibility: sequenceStarted ? 'visible' : 'hidden',
+              borderRadius: '50%',
+              backgroundColor: senderAvatarColor || '#A8D0FF',
+              backgroundImage: senderAvatar ? `url(${senderAvatar})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
             }}
-          />
+          >
+            {!senderAvatar && sequenceStarted && (
+              <PuiTypography
+                sx={{
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {senderName ? senderName.charAt(0) : '?'}
+              </PuiTypography>
+            )}
+          </PuiStack>
         )}
 
         {/* Message bubble */}

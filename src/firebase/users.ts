@@ -73,3 +73,21 @@ export function subscribeToContacts(
     callback(contacts);
   });
 }
+
+export async function getUserById(userId: string): Promise<Contact | null> {
+  const userDoc = await db.collection('users').doc(userId).get();
+
+  if (!userDoc.exists) {
+    return null;
+  }
+
+  const data = userDoc.data();
+  return {
+    id: userDoc.id,
+    displayName: data?.displayName ?? data?.name ?? null,
+    email: data?.email ?? null,
+    avatarUrl: data?.avatarUrl ?? null,
+    avatarColor: data?.avatarColor ?? pickAvatarColor(userId),
+    status: data?.status ?? null,
+  };
+}
