@@ -2,15 +2,17 @@ import { PuiBox, PuiStack } from 'piche.ui';
 import { FC, useEffect, useRef } from 'react';
 
 import type { ConversationMessage } from '../../../firebase/conversations';
+import type { Contact } from '../../../firebase/users';
 import { MessageCard } from './MessageCard';
 
 interface MessageListProps {
   messages: ConversationMessage[];
   currentUserId: string;
   isGroup?: boolean;
+  contactsMap: Map<string, Contact>;
 }
 
-export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isGroup = false }) => {
+export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isGroup = false, contactsMap }) => {
   const listRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -60,13 +62,18 @@ export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isG
               new Date(message.createdAt).getTime() - new Date(prevMessage.createdAt).getTime() >
                 5 * 60 * 1000; // 5 minutes
 
+            // Get sender's profile from contactsMap for consistent avatar
+            const senderProfile = contactsMap.get(message.senderId);
+
             return (
               <MessageCard
                 key={message.id}
                 message={message}
                 isUserMessage={isUserMessage}
                 sequenceStarted={sequenceStarted}
-                senderName={!isUserMessage ? message.senderName : undefined}
+                senderName={!isUserMessage ? (senderProfile?.displayName || message.senderName) : undefined}
+                senderAvatar={!isUserMessage ? senderProfile?.avatarUrl : undefined}
+                senderAvatarColor={!isUserMessage ? senderProfile?.avatarColor : undefined}
                 isGroup={isGroup}
               />
             );

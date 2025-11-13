@@ -4,6 +4,7 @@ import type firebaseCompat from 'firebase/compat/app';
 import { PuiStack, PuiTypography } from 'piche.ui';
 
 import type { ConversationMessage } from '../../../firebase/conversations';
+import type { Contact } from '../../../firebase/users';
 import type { ViewConversation } from '../Workspace';
 import { ConversationInput } from './ConversationInput';
 import { ConversationTopBar } from './ConversationTopBar';
@@ -16,9 +17,10 @@ type ChatViewProps = {
   messages: ConversationMessage[];
   onSendMessage: (payload: { text: string; file?: File | null }) => Promise<void>;
   isSending: boolean;
+  contactsMap: Map<string, Contact>;
 };
 
-export function ChatView({ user, conversation, messages, onSendMessage, isSending }: ChatViewProps) {
+export function ChatView({ user, conversation, messages, onSendMessage, isSending, contactsMap }: ChatViewProps) {
   const [composerValue, setComposerValue] = useState('');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
@@ -76,6 +78,7 @@ export function ChatView({ user, conversation, messages, onSendMessage, isSendin
           messages={messages}
           currentUserId={user.uid}
           isGroup={conversation.participants.length > 2}
+          contactsMap={contactsMap}
         />
       </MessagesContainer>
 

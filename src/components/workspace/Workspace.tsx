@@ -17,6 +17,7 @@ import {
   type ConversationMessage,
 } from '../../firebase/conversations';
 import {
+  getUserById,
   subscribeToContacts,
   subscribeToUserProfile,
   type Contact,
@@ -57,6 +58,9 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [currentUserProfile, setCurrentUserProfile] = useState<Contact | null>(
+    null
+  );
   const [activeApp, setActiveApp] = useState<'chat' | 'profile'>('chat');
   const [profileContact, setProfileContact] = useState<ProfileContact | null>(
     null
@@ -67,8 +71,12 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   const contactsMap = useMemo(() => {
     const map = new Map<string, Contact>();
     contacts.forEach((contact) => map.set(contact.id, contact));
+    // Include current user's profile in the map
+    if (currentUserProfile) {
+      map.set(currentUserProfile.id, currentUserProfile);
+    }
     return map;
-  }, [contacts]);
+  }, [contacts, currentUserProfile]);
 
   const buildViewConversation = useCallback(
     (conversation: Conversation): ViewConversation => {
@@ -148,6 +156,14 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   }, [user.uid]);
 
   useEffect(() => {
+    // Load current user's profile
+    const loadUserProfile = async () => {
+      const profile = await getUserById(user.uid);
+      if (profile) {
+        setCurrentUserProfile(profile);
+      }
+    };
+    void loadUserProfile();
     setIsProfileLoading(true);
     const unsubscribe = subscribeToUserProfile(user.uid, (nextProfile) => {
       setProfileContact(nextProfile);
@@ -280,10 +296,17 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
     setIsSending(true);
 
     try {
+      const userProfile = contactsMap.get(user.uid);
       await sendMessage({
         conversationId: conversationToSend.id,
         senderId: user.uid,
-        senderName: user.displayName ?? user.email ?? 'Unknown user',
+        senderName:
+          userProfile?.displayName ??
+          user.displayName ??
+          user.email ??
+          'Unknown user',
+        senderAvatarUrl: userProfile?.avatarUrl ?? user.photoURL ?? null,
+        senderAvatarColor: userProfile?.avatarColor ?? '#A8D0FF',
         text,
         file,
       });
@@ -322,15 +345,14 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
               contactsMap={contactsMap}
               currentUserId={user.uid}
             />
-
             <ChatView
               user={user}
               conversation={activeConversationState.conversation}
               messages={activeConversationState.messages}
               onSendMessage={handleSendMessage}
               isSending={isSending}
+              contactsMap={contactsMap}
             />
-
             <AiPanel />
           </>
         )}
