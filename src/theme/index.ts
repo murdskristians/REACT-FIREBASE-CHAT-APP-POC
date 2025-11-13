@@ -1,7 +1,7 @@
-import { PuiCreateTheme } from 'piche.ui';
+import { createTheme } from '@mui/material/styles';
 
 // Create custom theme with Poppins and Inter fonts
-export const theme = PuiCreateTheme({
+export const theme = createTheme({
   typography: {
     fontFamily: "'Poppins', 'Inter', sans-serif",
   },
