@@ -1,41 +1,31 @@
-import {
-  FormEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import type firebaseCompat from 'firebase/compat/app';
 
-import { PuiIcon, PuiSvgIcon } from 'piche.ui';
+import { PuiDivider, PuiIcon, PuiStack, PuiSvgIcon, PuiTypography } from 'piche.ui';
 
 import type { ConversationMessage } from '../../../firebase/conversations';
 import type { ViewConversation } from '../Workspace';
-import { AddMedia } from './AddMedia';
-import { MessageBubble } from './MessageBubble';
-import { SendMessage } from './SendMessage';
-import { VoiceInput } from './VoiceInput';
+import { ConversationInput } from './ConversationInput';
+import { MessageList } from './MessageList';
+import {
+  ChatAreaWrapper,
+  ConversationInfoWrapper,
+  MessagesContainer,
+  StyledTopBar,
+  StyledTopBarButton,
+} from './StyledComponents';
 
 type ChatViewProps = {
   user: firebaseCompat.User;
   conversation: ViewConversation | null;
   messages: ConversationMessage[];
-  onSendMessage: (payload: {
-    text: string;
-    file?: File | null;
-  }) => Promise<void>;
+  onSendMessage: (payload: { text: string; file?: File | null }) => Promise<void>;
   isSending: boolean;
 };
 
-export function ChatView({
-  user,
-  conversation,
-  messages,
-  onSendMessage,
-  isSending,
-}: ChatViewProps) {
+export function ChatView({ user, conversation, messages, onSendMessage, isSending }: ChatViewProps) {
   const [composerValue, setComposerValue] = useState('');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const listRef = useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
     if (!conversation) {
@@ -45,9 +35,6 @@ export function ChatView({
   }, [conversation]);
 
   useEffect(() => {
-    if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
-    }
     if (!messages.length) {
       setComposerValue('');
       setPendingFile(null);
@@ -72,18 +59,16 @@ export function ChatView({
     setPendingFile(null);
   };
 
-
   if (!conversation) {
     return (
-      <section
-        className="chat-panel chat-panel--empty"
-        aria-label="Conversation area"
-      >
-        <div className="chat-panel__empty">
-          <h2>Select a conversation</h2>
-          <p>Choose a contact from the list to start chatting.</p>
-        </div>
-      </section>
+      <PuiStack height="100%" justifyContent="center" alignItems="center" gap="10px">
+        <PuiTypography variant="body-m-medium" color="grey.400">
+          Select a conversation
+        </PuiTypography>
+        <PuiTypography variant="body-sm-regular" color="grey.300">
+          Choose a contact from the list to start chatting.
+        </PuiTypography>
+      </PuiStack>
     );
   }
 
@@ -95,132 +80,74 @@ export function ChatView({
     .toUpperCase();
 
   return (
-    <section className="chat-panel" aria-label="Conversation area">
-      <header className="chat-panel__header">
-        <div className="chat-panel__contact">
-          <div
-            className="chat-panel__avatar"
-            style={{
-              background: conversation.displayAvatarUrl
-                ? undefined
-                : conversation.displayAvatarColor ?? '#A8D0FF',
-            }}
-          >
-            {conversation.displayAvatarUrl ? (
-              <img
-                src={conversation.displayAvatarUrl}
-                alt={conversation.displayTitle}
-              />
-            ) : (
-              conversationInitials
-            )}
-          </div>
-          <div className="chat-panel__meta">
-            <h2>{conversation.displayTitle}</h2>
-            <p>{conversation.displaySubtitle}</p>
-          </div>
-        </div>
-        <div className="chat-panel__actions">
-          <button
-            type="button"
-            className="chat-panel__action"
-            aria-label="Add participant"
-            title="Add participant"
-          >
-            <PuiSvgIcon
-              width={20}
-              height={20}
-              icon={PuiIcon.UserPlus1}
-            />
-          </button>
-          <button
-            type="button"
-            className="chat-panel__action chat-panel__action--call"
-            aria-label="Start a call"
-            title="Start a call"
-          >
-            <PuiSvgIcon
-              width={16}
-              height={16}
-              icon={PuiIcon.Phone}
-            />
-          </button>
-        </div>
-      </header>
-
-      <div className="chat-panel__messages">
-        <ul className="chat-messages" ref={listRef}>
-          {messages.length === 0 ? (
-            <li className="chat-messages__empty">
-              No messages yet. Be the first to say hello.
-            </li>
-          ) : (
-            messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isOwn={message.senderId === user.uid}
-              />
-            ))
-          )}
-        </ul>
-      </div>
-
-      <form className="chat-panel__composer" onSubmit={handleSubmit}>
-        {pendingFile ? (
-          <div className="chat-panel__preview">
-            <img
-              src={URL.createObjectURL(pendingFile)}
-              alt="Attachment preview"
-            />
-            <button
-              type="button"
-              onClick={() => setPendingFile(null)}
-              aria-label="Remove attachment"
+    <ChatAreaWrapper>
+      <PuiStack>
+        <StyledTopBar>
+          <ConversationInfoWrapper>
+            <div
+              className="chat-panel__avatar"
+              style={{
+                background: conversation.displayAvatarUrl
+                  ? undefined
+                  : conversation.displayAvatarColor ?? '#A8D0FF',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 600,
+                fontSize: '13px',
+                color: '#1f2131',
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}
             >
-              ✕
-            </button>
-          </div>
-        ) : null}
-        <div className="chat-panel__composer-row">
-          <AddMedia onFileSelect={(file) => setPendingFile(file)} />
-          <button
-            type="button"
-            className="chat-panel__composer-button chat-panel__composer-button--emoji"
-            aria-label="Add emoji"
-            title="Add emoji"
-          >
-            <PuiSvgIcon
-              width={16}
-              height={16}
-              icon={PuiIcon.FaceSmile}
-            />
-          </button>
-          <input
-            type="text"
-            placeholder={`Message ${conversation.displayTitle}`}
-            value={composerValue}
-            onChange={(event) => setComposerValue(event.target.value)}
-            className="chat-panel__composer-input"
-          />
-          <VoiceInput />
-          {(composerValue.trim() || pendingFile) && (
-            <>
-              <div className="chat-panel__composer-divider"></div>
-              <SendMessage
-                handleSend={async () => {
-                  const text = composerValue.trim();
-                  if (!text && !pendingFile) return;
-                  await onSendMessage({ text, file: pendingFile });
-                  setComposerValue('');
-                  setPendingFile(null);
-                }}
-                disabled={isSending}
-              />
-            </>
-          )}
-        </div>
-      </form>
-    </section>
+              {conversation.displayAvatarUrl ? (
+                <img
+                  src={conversation.displayAvatarUrl}
+                  alt={conversation.displayTitle}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                conversationInitials
+              )}
+            </div>
+            <PuiStack sx={{ minWidth: 0, overflow: 'hidden' }}>
+              <PuiTypography variant="body-m-semibold" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {conversation.displayTitle}
+              </PuiTypography>
+              <PuiTypography variant="body-sm-regular" color="grey.400" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {conversation.displaySubtitle}
+              </PuiTypography>
+            </PuiStack>
+          </ConversationInfoWrapper>
+          <PuiStack direction="row" gap="16px">
+            <StyledTopBarButton aria-label="Add participant" title="Add participant">
+              <PuiSvgIcon width={20} height={20} icon={PuiIcon.UserPlus1} />
+            </StyledTopBarButton>
+            <StyledTopBarButton className="contained" aria-label="Start a call" title="Start a call">
+              <PuiSvgIcon width={16} height={16} icon={PuiIcon.Phone} />
+            </StyledTopBarButton>
+          </PuiStack>
+        </StyledTopBar>
+        <PuiDivider />
+      </PuiStack>
+
+      <MessagesContainer>
+        <MessageList messages={messages} currentUserId={user.uid} />
+      </MessagesContainer>
+
+      <ConversationInput
+        conversationTitle={conversation.displayTitle}
+        composerValue={composerValue}
+        setComposerValue={setComposerValue}
+        pendingFile={pendingFile}
+        setPendingFile={setPendingFile}
+        onSubmit={handleSubmit}
+        isSending={isSending}
+        onSendMessage={onSendMessage}
+      />
+    </ChatAreaWrapper>
   );
 }
