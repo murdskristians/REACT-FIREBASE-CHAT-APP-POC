@@ -1,23 +1,39 @@
 import type firebaseCompat from 'firebase/compat/app';
 
+type ActiveApp = 'chat' | 'profile';
+
 type AppDockProps = {
   user: firebaseCompat.User;
-  onSignOut: () => Promise<void> | void;
+  activeApp: ActiveApp;
+  onSelectApp: (app: ActiveApp) => void;
+  onOpenProfile: () => void;
 };
 
-const DOCK_ITEMS = [
+type DockItem = {
+  id: 'spreadsheets' | 'chat' | 'contacts';
+  label: string;
+  icon: string;
+};
+
+const DOCK_ITEMS: DockItem[] = [
   { id: 'spreadsheets', label: 'Spreadsheets', icon: '📊' },
-  { id: 'chat', label: 'Chat', icon: '💬', active: true },
+  { id: 'chat', label: 'Chat', icon: '💬' },
   { id: 'contacts', label: 'Contacts', icon: '👥' },
 ];
 
-export function AppDock({ user, onSignOut }: AppDockProps) {
+export function AppDock({ user, activeApp, onSelectApp, onOpenProfile }: AppDockProps) {
   const initials = (user.displayName ?? user.email ?? 'User')
     .split(' ')
     .map((part) => part[0])
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+  const handleDockClick = (id: DockItem['id']) => {
+    if (id === 'chat') {
+      onSelectApp('chat');
+    }
+  };
 
   return (
     <aside className="dock">
@@ -27,8 +43,11 @@ export function AppDock({ user, onSignOut }: AppDockProps) {
           <button
             key={item.id}
             type="button"
-            className={`dock__item ${item.active ? 'dock__item--active' : ''}`}
-            aria-pressed={item.active ?? false}
+            className={`dock__item ${
+              item.id === 'chat' && activeApp === 'chat' ? 'dock__item--active' : ''
+            }`}
+            aria-pressed={item.id === 'chat' && activeApp === 'chat'}
+            onClick={() => handleDockClick(item.id)}
           >
             <span aria-hidden="true" className="dock__item-icon">
               {item.icon}
@@ -37,7 +56,12 @@ export function AppDock({ user, onSignOut }: AppDockProps) {
           </button>
         ))}
       </nav>
-      <button type="button" className="dock__user" onClick={onSignOut} title="Sign out">
+      <button
+        type="button"
+        className={`dock__user ${activeApp === 'profile' ? 'dock__item--active' : ''}`}
+        onClick={onOpenProfile}
+        title="Open profile"
+      >
         {user.photoURL ? (
           <img src={user.photoURL} alt={user.displayName ?? 'Current user'} />
         ) : (

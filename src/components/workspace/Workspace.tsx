@@ -1,3 +1,4 @@
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type firebaseCompat from 'firebase/compat/app';
 
@@ -15,7 +16,15 @@ import {
   type Conversation,
   type ConversationMessage,
 } from '../../firebase/conversations';
-import { subscribeToContacts, type Contact } from '../../firebase/users';
+import {
+  subscribeToContacts,
+  subscribeToUserProfile,
+  type Contact,
+} from '../../firebase/users';
+import { MainPanelWrapper } from '../../pages/user-info/MainPanelWrapper';
+import { PersonalInfo } from '../../pages/user-info/PersonalInfo';
+import type { ProfileContact } from '../../types/profile';
+import { theme } from '../../theme';
 
 type WorkspaceProps = {
   user: firebaseCompat.User;
@@ -48,6 +57,11 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [activeApp, setActiveApp] = useState<'chat' | 'profile'>('chat');
+  const [profileContact, setProfileContact] = useState<ProfileContact | null>(
+    null
+  );
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const ensuredContactsRef = useRef<Set<string>>(new Set());
 
   const contactsMap = useMemo(() => {
@@ -128,6 +142,16 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   useEffect(() => {
     const unsubscribe = subscribeToContacts(user.uid, (nextContacts) => {
       setContacts(nextContacts);
+    });
+
+    return unsubscribe;
+  }, [user.uid]);
+
+  useEffect(() => {
+    setIsProfileLoading(true);
+    const unsubscribe = subscribeToUserProfile(user.uid, (nextProfile) => {
+      setProfileContact(nextProfile);
+      setIsProfileLoading(false);
     });
 
     return unsubscribe;
@@ -224,6 +248,14 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
     }
   }, [selectedConversationId]);
 
+  const handleSelectApp = (app: 'chat' | 'profile') => {
+    setActiveApp(app);
+  };
+
+  const handleOpenProfile = () => {
+    setActiveApp('profile');
+  };
+
   const handleSendMessage = async ({
     text,
     file,
@@ -261,28 +293,48 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   };
 
   return (
-    <div className="workspace">
-      <AppDock user={user} onSignOut={onSignOut} />
+    <MuiThemeProvider theme={theme}>
+      <div className="workspace">
+        <AppDock
+          user={user}
+          activeApp={activeApp}
+          onSelectApp={handleSelectApp}
+          onOpenProfile={handleOpenProfile}
+        />
 
-      <ConversationList
-        conversations={filteredConversations}
-        onSearchChange={setSearchTerm}
-        searchTerm={searchTerm}
-        selectedConversationId={selectedConversationId}
-        onSelectConversation={handleConversationSelect}
-        contactsMap={contactsMap}
-        currentUserId={user.uid}
-      />
+        {activeApp === 'profile' ? (
+          <section className="workspace__profile-view">
+            <MainPanelWrapper onSignOut={onSignOut}>
+              <PersonalInfo
+                profileContact={profileContact}
+                isLoading={isProfileLoading}
+              />
+            </MainPanelWrapper>
+          </section>
+        ) : (
+          <>
+            <ConversationList
+              conversations={filteredConversations}
+              onSearchChange={setSearchTerm}
+              searchTerm={searchTerm}
+              selectedConversationId={selectedConversationId}
+              onSelectConversation={handleConversationSelect}
+              contactsMap={contactsMap}
+              currentUserId={user.uid}
+            />
 
-      <ChatView
-        user={user}
-        conversation={activeConversationState.conversation}
-        messages={activeConversationState.messages}
-        onSendMessage={handleSendMessage}
-        isSending={isSending}
-      />
+            <ChatView
+              user={user}
+              conversation={activeConversationState.conversation}
+              messages={activeConversationState.messages}
+              onSendMessage={handleSendMessage}
+              isSending={isSending}
+            />
 
-      <AiPanel />
-    </div>
+            <AiPanel />
+          </>
+        )}
+      </div>
+    </MuiThemeProvider>
   );
 }
