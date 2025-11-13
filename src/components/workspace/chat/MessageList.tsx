@@ -7,9 +7,10 @@ import { MessageCard } from './MessageCard';
 interface MessageListProps {
   messages: ConversationMessage[];
   currentUserId: string;
+  isGroup?: boolean;
 }
 
-export const MessageList: FC<MessageListProps> = ({ messages, currentUserId }) => {
+export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isGroup = false }) => {
   const listRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export const MessageList: FC<MessageListProps> = ({ messages, currentUserId }) =
                 isUserMessage={isUserMessage}
                 sequenceStarted={sequenceStarted}
                 senderName={!isUserMessage ? message.senderName : undefined}
+                isGroup={isGroup}
               />
             );
           })

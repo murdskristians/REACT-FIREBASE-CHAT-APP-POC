@@ -15,6 +15,7 @@ export const StyledTextContent = PuiStyled(PuiTypography)(({ theme }) => ({
   display: 'inline',
   fontSize: '13px',
   lineHeight: 1.6,
+  fontFamily: "'Poppins', 'Inter', sans-serif",
   '& .mention': {
     color: theme.palette.primary.main,
     fontSize: '13px',
@@ -44,4 +45,5 @@ export const StyledMessageStatus = PuiStyled(PuiBox, {
   color: '#939393',
   fontSize: '11px',
   whiteSpace: 'nowrap',
+  fontFamily: "'Poppins', 'Inter', sans-serif",
 }));

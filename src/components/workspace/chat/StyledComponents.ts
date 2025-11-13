@@ -1,4 +1,4 @@
-import { PuiBox, PuiDivider, PuiIconButton, PuiStack, PuiStyled } from 'piche.ui';
+import { PuiBox, PuiDivider, PuiIconButton, PuiStack, PuiStyled, PuiTypography } from 'piche.ui';
 
 export const ChatAreaWrapper = PuiStyled(PuiStack)(() => ({
   height: '100%',
@@ -59,6 +59,17 @@ export const ConversationInfoWrapper = PuiStyled(PuiBox)({
   gap: '16px',
   minWidth: 0,
 });
+
+export const StyledConversationTitle = PuiStyled(PuiTypography)(({ theme }) => ({
+  cursor: 'pointer',
+  fontWeight: 600,
+  fontSize: '14px',
+  lineHeight: 1.6,
+  '&:hover': { color: theme.palette.grey[400] },
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+}));
 
 export const StyledDivider = PuiStyled(PuiDivider)(() => ({
   width: '100%',

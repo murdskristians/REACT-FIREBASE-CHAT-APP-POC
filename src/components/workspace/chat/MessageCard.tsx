@@ -10,6 +10,7 @@ interface MessageCardProps {
   sequenceStarted: boolean;
   senderName?: string;
   senderAvatar?: string;
+  isGroup?: boolean;
 }
 
 export const MessageCard: FC<MessageCardProps> = ({
@@ -17,6 +18,7 @@ export const MessageCard: FC<MessageCardProps> = ({
   isUserMessage,
   sequenceStarted,
   senderName,
+  isGroup = false,
 }) => {
   const time = new Date(message?.createdAt?.toDate() ?? '').toLocaleTimeString('en-GB', {
     hour: '2-digit',
@@ -73,10 +75,17 @@ export const MessageCard: FC<MessageCardProps> = ({
             maxWidth: '100%',
           }}
         >
-          {!isUserMessage && senderName && (
+          {!isUserMessage && senderName && isGroup && (
             <PuiTypography
               variant="body-sm-medium"
-              sx={{ color: '#a0a0a0', marginRight: 'auto', textWrap: 'nowrap', width: '100%' }}
+              sx={{
+                color: '#a0a0a0',
+                marginRight: 'auto',
+                textWrap: 'nowrap',
+                width: '100%',
+                fontFamily: "'Poppins', 'Inter', sans-serif",
+                fontSize: '12px',
+              }}
             >
               {senderName}
             </PuiTypography>
