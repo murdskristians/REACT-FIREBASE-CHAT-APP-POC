@@ -1,5 +1,4 @@
 import EmojiPicker from 'emoji-picker-react';
-import { useTheme } from 'piche.ui';
 import type { FC, MouseEvent } from 'react';
 
 import { MessageReactionsListWrapper } from './StyledComponents';
@@ -10,8 +9,6 @@ interface MessageReactionsWrapperProps {
 }
 
 export const MessageReactionsWrapper: FC<MessageReactionsWrapperProps> = ({ messageId, handleClose }) => {
-  const theme = useTheme();
-
   const handleReaction = ({ unified }: { unified: string }, e: unknown) => {
     // No logic - just close
     handleClose(e as MouseEvent<HTMLElement>);

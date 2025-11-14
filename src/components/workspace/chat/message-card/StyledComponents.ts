@@ -1,4 +1,4 @@
-import { Colors, PuiBox, PuiList, PuiListItemButton, PuiMenu, PuiPopover, PuiStack, PuiSvgIcon, PuiStyled } from 'piche.ui';
+import { PuiBox, PuiList, PuiListItemButton, PuiMenu, PuiPopover, PuiStack, PuiSvgIcon, PuiStyled } from 'piche.ui';
 
 export const MessageContextMenuPopup = PuiStyled(PuiMenu, {
   shouldForwardProp: propName => propName !== 'horizontal',
