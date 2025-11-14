@@ -5,7 +5,6 @@ import type { ViewConversation } from '../Workspace';
 import {
   ConversationInfoWrapper,
   StyledConversationTitle,
-  StyledConversationAvatar,
   StyledConversationSubtitle,
 } from './StyledComponents';
 
