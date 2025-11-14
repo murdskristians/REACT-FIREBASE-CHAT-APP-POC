@@ -23,6 +23,7 @@ export const Avatar: FC<AvatarProps> = ({
   const initials = getInitials(name);
   const sizeNum =
     typeof size === 'number' ? size : parseInt(size.toString(), 10) || 40;
+  const fontSize = `${sizeNum * 0.4}px`;
 
   return (
     <PuiBox
@@ -38,9 +39,10 @@ export const Avatar: FC<AvatarProps> = ({
         flexShrink: 0,
         backgroundColor: avatarUrl ? undefined : avatarColor,
         color: avatarUrl ? undefined : 'white',
-        fontSize: sizeNum <= 32 ? '14px' : '13px',
+        fontSize,
         fontWeight: 600,
         textTransform: 'uppercase',
+        lineHeight: 1,
         '& img': {
           width: '100%',
           height: '100%',
