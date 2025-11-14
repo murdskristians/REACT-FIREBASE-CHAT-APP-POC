@@ -36,7 +36,7 @@ export const StyledTopBarButton = PuiStyled(PuiIconButton)(({ theme }) => ({
     },
   },
   '&.contained': {
-    background: 'var(--palette-gradient)',
+    background: 'var(--palette-call-button)',
     svg: {
       color: theme.palette.common.white,
     },

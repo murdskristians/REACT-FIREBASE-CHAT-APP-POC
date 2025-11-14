@@ -15,7 +15,7 @@ export const TextMessage: FC<TextMessageProps> = ({ message, time, isUserMessage
       <StyledTextContent 
         variant="body-sm-regular"
         sx={{
-          color: isUserMessage ? '#ffffff' : 'inherit',
+          color: isUserMessage ? '#1f2131' : 'inherit',
         }}
       >
         {message.text}
@@ -23,7 +23,7 @@ export const TextMessage: FC<TextMessageProps> = ({ message, time, isUserMessage
       <StyledMessageStatus 
         component="span"
         sx={{
-          color: isUserMessage ? 'rgba(255, 255, 255, 0.7)' : '#939393',
+          color: isUserMessage ? '#939393' : '#939393',
         }}
       >
         {time}

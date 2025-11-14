@@ -243,8 +243,16 @@
   margin: 0 16px;
 }
 
+[data-palette='default'] .conversation-panel__search {
+  background: #ffffff;
+}
+
 .conversation-panel__search:focus-within {
   border-color: var(--palette-primary);
+}
+
+[data-palette='default'] .conversation-panel__search:focus-within {
+  border-color: #E5E7EB;
 }
 
 .conversation-panel__search input {
@@ -522,7 +530,7 @@
 }
 
 .chat-panel__action--call {
-  background: var(--palette-gradient);
+  background: var(--palette-call-button);
   color: #ffffff;
 }
 
@@ -568,8 +576,8 @@
 }
 
 .chat-messages__item--own .chat-messages__bubble {
-  background: var(--palette-gradient);
-  color: #ffffff;
+  background: var(--palette-message-bg);
+  color: #1f2131;
 }
 
 .chat-messages__avatar {

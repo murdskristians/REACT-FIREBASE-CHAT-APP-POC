@@ -2,45 +2,38 @@ import { useState, useEffect } from 'react';
 import { PuiBox, PuiTypography, PuiSwitch } from 'piche.ui';
 
 type ThemeMode = 'light' | 'dark';
-type ThemePalette = 'blue' | 'purple' | 'green' | 'orange' | 'pink' | 'default';
+type ThemePalette = 'purple' | 'green' | 'orange' | 'pink' | 'default';
 
 const PALETTE_STORAGE_KEY = 'app-theme-palette';
 
 const themePalettes = {
-  blue: {
-    name: 'Ocean Blue',
-    primary: '#3398DB',
-    primaryLight: '#E8F4FB',
-    primaryDark: '#4AA3DF',
-    gradient: 'linear-gradient(135deg, #3398DB 0%, #4AA3DF 100%)',
-  },
   purple: {
     name: 'Royal Purple',
-    primary: '#8B5CF6',
-    primaryLight: '#F3E8FF',
-    primaryDark: '#7C3AED',
-    gradient: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+    primary: '#6D28D9',
+    primaryLight: '#EDE9FE',
+    primaryDark: '#5B21B6',
+    gradient: 'linear-gradient(135deg, #6D28D9 0%, #5B21B6 100%)',
   },
   green: {
     name: 'Forest Green',
-    primary: '#10B981',
+    primary: '#059669',
     primaryLight: '#D1FAE5',
-    primaryDark: '#059669',
-    gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    primaryDark: '#047857',
+    gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
   },
   orange: {
     name: 'Sunset Orange',
-    primary: '#F59E0B',
-    primaryLight: '#FEF3C7',
-    primaryDark: '#D97706',
-    gradient: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    primary: '#EA580C',
+    primaryLight: '#FFEDD5',
+    primaryDark: '#C2410C',
+    gradient: 'linear-gradient(135deg, #EA580C 0%, #C2410C 100%)',
   },
   pink: {
     name: 'Rose Pink',
-    primary: '#EC4899',
+    primary: '#DB2777',
     primaryLight: '#FCE7F3',
-    primaryDark: '#DB2777',
-    gradient: 'linear-gradient(135deg, #EC4899 0%, #DB2777 100%)',
+    primaryDark: '#BE185D',
+    gradient: 'linear-gradient(135deg, #DB2777 0%, #BE185D 100%)',
   },
 };
 
@@ -171,8 +164,7 @@ export const AppearanceTheme = () => {
                     width: '100%',
                     height: '60px',
                     borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f5f7fb 100%)',
-                    border: '1px solid #E5E7EB',
+                    background: 'linear-gradient(135deg, #3398DB 0%, #4AA3DF 100%)',
                     marginBottom: '8px',
                   }}
                 />
