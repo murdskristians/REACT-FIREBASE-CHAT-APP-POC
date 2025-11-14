@@ -515,7 +515,9 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
               onSelectConversation={handleConversationSelect}
               contactsMap={contactsMap}
               currentUserId={user.uid}
-              onAddConversation={() => setShowUserSearchModal(true)}
+              onAddConversation={() => {
+                // TODO: Implement add conversation functionality
+              }}
             />
             <ChatView
               user={user}

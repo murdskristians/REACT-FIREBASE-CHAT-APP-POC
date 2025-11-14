@@ -55,7 +55,11 @@ export function ConversationList({
         <button
           type="button"
           className="conversation-panel__search-button"
-          onClick={onAddConversation}
+          onClick={() => {
+            if (onAddConversation) {
+              onAddConversation();
+            }
+          }}
         >
           ＋
         </button>
