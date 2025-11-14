@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app';
 
 import { db } from './index';
+import { ensureSavedMessagesConversationExists } from './conversations';
 import type {
   ProfileAdditionalEmail,
   ProfileContact,
@@ -54,6 +55,13 @@ export async function upsertUserProfile(user: firebase.User): Promise<void> {
       ...baseData,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
+
+    await ensureSavedMessagesConversationExists(
+      user.uid,
+      baseData.displayName,
+      baseData.avatarColor,
+      baseData.avatarUrl
+    );
   }
 }
 
@@ -216,8 +224,7 @@ export function subscribeToUserProfile(
           (typeof data.email === 'string' && data.email) ||
           'Unknown user',
         email: typeof data.email === 'string' ? data.email : null,
-        avatarUrl:
-          typeof data.avatarUrl === 'string' ? data.avatarUrl : null,
+        avatarUrl: typeof data.avatarUrl === 'string' ? data.avatarUrl : null,
         avatarColor:
           typeof data.avatarColor === 'string'
             ? data.avatarColor
@@ -229,7 +236,9 @@ export function subscribeToUserProfile(
             ? data.statusMessage
             : null,
         company:
-          typeof data.company === 'string' ? data.company : 'Piche Communications',
+          typeof data.company === 'string'
+            ? data.company
+            : 'Piche Communications',
         department:
           data.department && typeof data.department === 'object'
             ? (data.department as { name?: string | null })
@@ -246,9 +255,7 @@ export function subscribeToUserProfile(
             : null,
         socialLinks: normalizeSocialLinks(data.socialLinks),
         coverImageUrl:
-          typeof data.coverImageUrl === 'string'
-            ? data.coverImageUrl
-            : null,
+          typeof data.coverImageUrl === 'string' ? data.coverImageUrl : null,
       };
 
       callback(profile);
