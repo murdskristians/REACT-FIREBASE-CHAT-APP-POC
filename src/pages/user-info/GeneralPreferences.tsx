@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PuiBox, PuiTypography, PuiSwitch, PuiSelectV2, PuiInput } from 'piche.ui';
+import { PuiBox, PuiTypography, PuiSwitch, PuiSelectV2 } from 'piche.ui';
 import { MenuItem } from '@mui/material';
 
 export const GeneralPreferences = () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PuiBox, PuiTypography, PuiButton, PuiInput, PuiPasswordInput } from 'piche.ui';
+import { PuiBox, PuiTypography, PuiButton, PuiPasswordInput } from 'piche.ui';
 
 export const PasswordSecurity = () => {
   const [currentPassword, setCurrentPassword] = useState('');

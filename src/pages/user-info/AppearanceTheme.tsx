@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PuiBox, PuiTypography, PuiSwitch, PuiButton } from 'piche.ui';
+import { PuiBox, PuiTypography, PuiSwitch } from 'piche.ui';
 
 type ThemeMode = 'light' | 'dark';
 type ThemePalette = 'blue' | 'purple' | 'green' | 'orange' | 'pink' | 'default';
