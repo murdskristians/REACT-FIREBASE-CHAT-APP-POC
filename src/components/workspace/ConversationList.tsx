@@ -3,6 +3,7 @@ import type firebase from 'firebase/compat/app';
 import { ChangeEvent } from 'react';
 
 import type { Contact } from '../../firebase/users';
+import { Avatar } from './shared/Avatar';
 import type { ViewConversation } from './Workspace';
 
 type ConversationListProps = {
@@ -15,15 +16,6 @@ type ConversationListProps = {
   currentUserId: string;
   onAddConversation?: () => void;
 };
-
-const avatarFallbackPalette = [
-  '#FFD37D',
-  '#A8D0FF',
-  '#FFC8DD',
-  '#B5EAEA',
-  '#FFABAB',
-  '#BDB2FF',
-];
 
 const formatTimestamp = (timestamp?: firebase.firestore.Timestamp | null) => {
   if (!timestamp) {
@@ -63,7 +55,11 @@ export function ConversationList({
         <button
           type="button"
           className="conversation-panel__search-button"
-          onClick={onAddConversation}
+          onClick={() => {
+            if (onAddConversation) {
+              onAddConversation();
+            }
+          }}
         >
           ＋
         </button>
@@ -76,7 +72,7 @@ export function ConversationList({
         />
       </label>
       <ul className="conversation-panel__list">
-        {conversations.map((conversation, index) => {
+        {conversations.map((conversation) => {
           const isActive = conversation.id === selectedConversationId;
 
           const counterpartId =
@@ -98,16 +94,32 @@ export function ConversationList({
                 } sent a photo`
               : conversation.lastMessage?.text ?? 'No messages yet';
 
-          const fallbackColor =
-            counterpart?.avatarColor ??
-            conversation.avatarColor ??
-            avatarFallbackPalette[index % avatarFallbackPalette.length];
+          const isGroupConversation = conversation.participants.length > 2;
+          const currentUserProfile = contactsMap.get(currentUserId);
+          const currentUserAvatarUrl = currentUserProfile?.avatarUrl ?? null;
+          const avatarUrl = isGroupConversation
+            ? conversation.displayAvatarUrl ?? conversation.avatarUrl ?? null
+            : conversation.displayAvatarUrl ??
+              (conversation.avatarUrl !== currentUserAvatarUrl
+                ? conversation.avatarUrl
+                : null) ??
+              counterpart?.avatarUrl ??
+              null;
 
-          const avatarUrl =
-            conversation.displayAvatarUrl ??
-            conversation.avatarUrl ??
-            counterpart?.avatarUrl ??
-            null;
+          console.log('[ConversationList] Avatar Debug', {
+            conversationId: conversation.id,
+            displayTitle: counterpart?.displayName ?? conversation.title,
+            counterpartId,
+            counterpartFound: !!counterpart,
+            counterpartAvatarUrl: counterpart?.avatarUrl ?? 'null/undefined',
+            conversationDisplayAvatarUrl:
+              conversation.displayAvatarUrl ?? 'null/undefined',
+            conversationAvatarUrl: conversation.avatarUrl ?? 'null/undefined',
+            currentUserAvatarUrl: currentUserAvatarUrl ?? 'null/undefined',
+            isGroupConversation,
+            finalAvatarUrl: avatarUrl ?? 'null',
+            displayAvatarColor: conversation.displayAvatarColor,
+          });
 
           return (
             <li key={conversation.id}>
@@ -118,28 +130,13 @@ export function ConversationList({
                 }`}
                 onClick={() => onSelectConversation(conversation.id)}
               >
-                <span
+                <Avatar
                   className="conversation-panel__avatar"
-                  style={{
-                    background: avatarUrl ? undefined : fallbackColor,
-                  }}
-                >
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={displayTitle}
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    displayTitle
-                      .trim()
-                      .split(' ')
-                      .map((part) => part[0])
-                      .join('')
-                      .slice(0, 2)
-                      .toUpperCase() || 'U'
-                  )}
-                </span>
+                  avatarUrl={avatarUrl}
+                  name={displayTitle}
+                  avatarColor={conversation.displayAvatarColor}
+                  size={40}
+                />
                 <span className="conversation-panel__item-content">
                   <span className="conversation-panel__item-header">
                     <span className="conversation-panel__item-title">

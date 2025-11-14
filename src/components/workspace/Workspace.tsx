@@ -113,10 +113,35 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
         conversation.subtitle ??
         counterpart?.email ??
         'Last seen recently';
-      const displayAvatarUrl =
-        conversation.avatarUrl ?? counterpart?.avatarUrl ?? null;
+      const isGroupConversation = conversation.participants.length > 2;
+      const currentUserAvatarUrl = currentUserProfile?.avatarUrl ?? null;
+
+      console.log('[buildViewConversation] Avatar Debug', {
+        conversationId: conversation.id,
+        displayTitle: counterpart?.displayName ?? conversation.title,
+        counterpartId,
+        counterpartFound: !!counterpart,
+        counterpartAvatarUrl: counterpart?.avatarUrl ?? 'null/undefined',
+        conversationAvatarUrl: conversation.avatarUrl ?? 'null/undefined',
+        currentUserAvatarUrl: currentUserAvatarUrl ?? 'null/undefined',
+        isGroupConversation,
+      });
+      const displayAvatarUrl = isGroupConversation
+        ? conversation.avatarUrl ?? null
+        : counterpart?.avatarUrl ??
+          (conversation.avatarUrl !== currentUserAvatarUrl
+            ? conversation.avatarUrl
+            : null) ??
+          null;
       const displayAvatarColor =
         conversation.avatarColor ?? counterpart?.avatarColor ?? '#A8D0FF';
+
+      console.log('[buildViewConversation] Final Avatar Result', {
+        conversationId: conversation.id,
+        displayTitle: counterpart?.displayName ?? conversation.title,
+        finalDisplayAvatarUrl: displayAvatarUrl ?? 'null',
+        displayAvatarColor,
+      });
 
       return {
         ...conversation,
@@ -127,7 +152,7 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
         counterpartId,
       };
     },
-    [contactsMap, user.uid]
+    [contactsMap, user.uid, currentUserProfile]
   );
 
   const viewConversations = useMemo<ViewConversation[]>(() => {
@@ -488,7 +513,9 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
               onSelectConversation={handleConversationSelect}
               contactsMap={contactsMap}
               currentUserId={user.uid}
-              onAddConversation={() => setShowUserSearchModal(true)}
+              onAddConversation={() => {
+                // TODO: Implement add conversation functionality
+              }}
             />
             <ChatView
               user={user}

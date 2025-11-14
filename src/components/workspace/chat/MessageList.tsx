@@ -10,9 +10,18 @@ interface MessageListProps {
   currentUserId: string;
   isGroup?: boolean;
   contactsMap: Map<string, Contact>;
+  conversationAvatarColor?: string | null;
+  counterpartId?: string;
 }
 
-export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isGroup = false, contactsMap }) => {
+export const MessageList: FC<MessageListProps> = ({
+  messages,
+  currentUserId,
+  isGroup = false,
+  contactsMap,
+  conversationAvatarColor,
+  counterpartId,
+}) => {
   const listRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -62,8 +71,28 @@ export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isG
               new Date(message.createdAt).getTime() - new Date(prevMessage.createdAt).getTime() >
                 5 * 60 * 1000; // 5 minutes
 
-            // Get sender's profile from contactsMap for consistent avatar
             const senderProfile = contactsMap.get(message.senderId);
+            const isCounterpartMessage = !isGroup && message.senderId === counterpartId;
+            const avatarColor = isCounterpartMessage && conversationAvatarColor
+              ? conversationAvatarColor
+              : senderProfile?.avatarColor ?? '#A8D0FF';
+
+            if (!isUserMessage) {
+              console.log('[MessageList] Message Avatar Debug', {
+                messageId: message.id,
+                senderId: message.senderId,
+                senderName: message.senderName,
+                senderProfileFound: !!senderProfile,
+                senderProfileDisplayName: senderProfile?.displayName ?? 'not found',
+                senderProfileAvatarUrl: senderProfile?.avatarUrl ?? 'null/undefined',
+                messageSenderAvatarUrl: message.senderAvatarUrl ?? 'null/undefined',
+                senderProfileAvatarColor: senderProfile?.avatarColor ?? 'not found',
+                conversationAvatarColor,
+                counterpartId,
+                isCounterpartMessage,
+                finalAvatarColor: avatarColor,
+              });
+            }
 
             return (
               <MessageCard
@@ -73,7 +102,7 @@ export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isG
                 sequenceStarted={sequenceStarted}
                 senderName={!isUserMessage ? (senderProfile?.displayName || message.senderName) : undefined}
                 senderAvatar={!isUserMessage ? senderProfile?.avatarUrl : undefined}
-                senderAvatarColor={!isUserMessage ? senderProfile?.avatarColor : undefined}
+                senderAvatarColor={!isUserMessage ? avatarColor : undefined}
                 isGroup={isGroup}
               />
             );

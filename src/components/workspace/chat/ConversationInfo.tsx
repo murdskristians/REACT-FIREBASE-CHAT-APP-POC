@@ -1,7 +1,8 @@
-import { PuiBox, PuiStack } from 'piche.ui';
+import { PuiStack } from 'piche.ui';
 import { FC } from 'react';
 
 import type { ViewConversation } from '../Workspace';
+import { Avatar } from '../shared/Avatar';
 import {
   ConversationInfoWrapper,
   StyledConversationTitle,
@@ -13,37 +14,30 @@ interface ConversationInfoProps {
   onContactClick?: () => void;
 }
 
-export const ConversationInfo: FC<ConversationInfoProps> = ({ conversation, onContactClick }) => {
-  const conversationInitials = conversation.displayTitle
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+export const ConversationInfo: FC<ConversationInfoProps> = ({
+  conversation,
+  onContactClick,
+}) => {
+  console.log('[ConversationInfo] Top Bar Avatar', {
+    conversationId: conversation.id,
+    displayTitle: conversation.displayTitle,
+    displayAvatarUrl: conversation.displayAvatarUrl ?? 'null/undefined',
+    displayAvatarColor: conversation.displayAvatarColor,
+    counterpartId: conversation.counterpartId,
+  });
 
   return (
     <ConversationInfoWrapper
       onClick={onContactClick}
       style={{ cursor: onContactClick ? 'pointer' : 'default' }}
     >
-      <PuiBox
+      <Avatar
         className="chat-panel__avatar"
-        sx={{
-          background: conversation.displayAvatarUrl
-            ? undefined
-            : conversation.displayAvatarColor ?? '#A8D0FF',
-        }}
-      >
-        {conversation.displayAvatarUrl ? (
-          <img
-            src={conversation.displayAvatarUrl}
-            alt={conversation.displayTitle}
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          conversationInitials
-        )}
-      </PuiBox>
+        avatarUrl={conversation.displayAvatarUrl}
+        name={conversation.displayTitle}
+        avatarColor={conversation.displayAvatarColor}
+        size={40}
+      />
       <PuiStack gap="2px" sx={{ minWidth: 0 }}>
         <StyledConversationTitle variant="body-m-semibold">
           {conversation.displayTitle}

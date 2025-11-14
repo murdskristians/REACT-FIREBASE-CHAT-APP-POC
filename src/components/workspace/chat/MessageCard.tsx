@@ -2,6 +2,7 @@ import { PuiStack, PuiTypography } from 'piche.ui';
 import { FC } from 'react';
 
 import type { ConversationMessage } from '../../../firebase/conversations';
+import { Avatar } from '../shared/Avatar';
 import { TextMessage } from './TextMessage';
 
 interface MessageCardProps {
@@ -23,15 +24,18 @@ export const MessageCard: FC<MessageCardProps> = ({
   senderAvatarColor,
   isGroup = false,
 }) => {
-  const time = new Date(message?.createdAt?.toDate() ?? '').toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }) ?? '';
+  const time =
+    new Date(message?.createdAt?.toDate() ?? '').toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }) ?? '';
 
   return (
     <PuiStack
-      className={`message-wrapper ${isUserMessage ? 'user-message' : 'other-message'}`}
+      className={`message-wrapper ${
+        isUserMessage ? 'user-message' : 'other-message'
+      }`}
       sx={{
         width: '100%',
         flexDirection: 'row',
@@ -49,48 +53,31 @@ export const MessageCard: FC<MessageCardProps> = ({
           width: '100%',
         }}
       >
-        {/* Avatar for non-user messages */}
         {!isUserMessage && (
-          <PuiStack
+          <Avatar
+            avatarUrl={senderAvatar}
+            name={senderName || 'User'}
+            avatarColor={senderAvatarColor}
+            size={32}
             sx={{
-              width: '32px',
-              height: '32px',
-              flexShrink: 0,
               visibility: sequenceStarted ? 'visible' : 'hidden',
-              borderRadius: '50%',
-              backgroundColor: senderAvatarColor || '#A8D0FF',
-              backgroundImage: senderAvatar ? `url(${senderAvatar})` : 'none',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
             }}
-          >
-            {!senderAvatar && sequenceStarted && (
-              <PuiTypography
-                sx={{
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {senderName ? senderName.charAt(0) : '?'}
-              </PuiTypography>
-            )}
-          </PuiStack>
+          />
         )}
 
         {/* Message bubble */}
         <PuiStack
-          className={`message-bubble ${isUserMessage ? 'user-message-bubble' : ''}`}
+          className={`message-bubble ${
+            isUserMessage ? 'user-message-bubble' : ''
+          }`}
           sx={{
             width: 'min-content',
             flexWrap: 'wrap',
             alignItems: 'end',
             gap: '8px',
-            borderRadius: isUserMessage ? '16px 0 16px 16px' : '0px 16px 16px 16px',
+            borderRadius: isUserMessage
+              ? '16px 0 16px 16px'
+              : '0px 16px 16px 16px',
             padding: '8px 16px',
             background: isUserMessage ? 'var(--palette-message-bg)' : '#ffffff',
             color: isUserMessage ? '#1f2131' : '#1f2131',
