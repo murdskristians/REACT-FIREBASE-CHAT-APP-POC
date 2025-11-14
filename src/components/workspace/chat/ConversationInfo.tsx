@@ -2,6 +2,7 @@ import { PuiBox, PuiStack } from 'piche.ui';
 import { FC } from 'react';
 
 import type { ViewConversation } from '../Workspace';
+import { getInitials } from '../shared/avatarUtils';
 import {
   ConversationInfoWrapper,
   StyledConversationTitle,
@@ -25,12 +26,7 @@ export const ConversationInfo: FC<ConversationInfoProps> = ({
     counterpartId: conversation.counterpartId,
   });
 
-  const conversationInitials = conversation.displayTitle
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const conversationInitials = getInitials(conversation.displayTitle);
 
   return (
     <ConversationInfoWrapper

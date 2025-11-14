@@ -3,6 +3,7 @@ import type firebase from 'firebase/compat/app';
 import { ChangeEvent } from 'react';
 
 import type { Contact } from '../../firebase/users';
+import { getInitials } from './shared/avatarUtils';
 import type { ViewConversation } from './Workspace';
 
 type ConversationListProps = {
@@ -151,13 +152,7 @@ export function ConversationList({
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    displayTitle
-                      .trim()
-                      .split(' ')
-                      .map((part) => part[0])
-                      .join('')
-                      .slice(0, 2)
-                      .toUpperCase() || 'U'
+                    getInitials(displayTitle)
                   )}
                 </span>
                 <span className="conversation-panel__item-content">

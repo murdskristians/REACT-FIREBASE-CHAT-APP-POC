@@ -2,6 +2,7 @@ import { PuiStack, PuiTypography } from 'piche.ui';
 import { FC } from 'react';
 
 import type { ConversationMessage } from '../../../firebase/conversations';
+import { getInitials } from '../shared/avatarUtils';
 import { TextMessage } from './TextMessage';
 
 interface MessageCardProps {
@@ -76,7 +77,7 @@ export const MessageCard: FC<MessageCardProps> = ({
                   textTransform: 'uppercase',
                 }}
               >
-                {senderName ? senderName.charAt(0) : '?'}
+                {getInitials(senderName || 'User')}
               </PuiTypography>
             )}
           </PuiStack>
