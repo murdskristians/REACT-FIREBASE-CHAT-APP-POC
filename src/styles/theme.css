@@ -7,45 +7,48 @@
   --text-secondary: #6B7280;
   --border-color: #E5E7EB;
   --dock-bg: #272727;
-  --palette-primary: #7f66ff;
-  --palette-primary-dark: #5f4bff;
-  --palette-primary-light: #f6f8ff;
-  --palette-gradient: linear-gradient(135deg, #7f66ff 0%, #5f4bff 100%);
-}
-
-[data-palette='blue'] {
   --palette-primary: #3398DB;
   --palette-primary-dark: #4AA3DF;
   --palette-primary-light: #E8F4FB;
   --palette-gradient: linear-gradient(135deg, #3398DB 0%, #4AA3DF 100%);
+  --palette-call-button: #3398DB;
+  --palette-message-bg: #E8F4FB;
 }
 
 [data-palette='purple'] {
-  --palette-primary: #8B5CF6;
-  --palette-primary-dark: #7C3AED;
-  --palette-primary-light: #F3E8FF;
-  --palette-gradient: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  --palette-primary: #6D28D9;
+  --palette-primary-dark: #5B21B6;
+  --palette-primary-light: #EDE9FE;
+  --palette-gradient: linear-gradient(135deg, #6D28D9 0%, #5B21B6 100%);
+  --palette-call-button: #7C3AED;
+  --palette-message-bg: #A78BFA;
 }
 
 [data-palette='green'] {
-  --palette-primary: #10B981;
-  --palette-primary-dark: #059669;
+  --palette-primary: #059669;
+  --palette-primary-dark: #047857;
   --palette-primary-light: #D1FAE5;
-  --palette-gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --palette-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --palette-call-button: #10B981;
+  --palette-message-bg: #34D399;
 }
 
 [data-palette='orange'] {
-  --palette-primary: #F59E0B;
-  --palette-primary-dark: #D97706;
-  --palette-primary-light: #FEF3C7;
-  --palette-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --palette-primary: #EA580C;
+  --palette-primary-dark: #C2410C;
+  --palette-primary-light: #FFEDD5;
+  --palette-gradient: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+  --palette-call-button: #F59E0B;
+  --palette-message-bg: #FBBF24;
 }
 
 [data-palette='pink'] {
-  --palette-primary: #EC4899;
-  --palette-primary-dark: #DB2777;
+  --palette-primary: #DB2777;
+  --palette-primary-dark: #BE185D;
   --palette-primary-light: #FCE7F3;
-  --palette-gradient: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+  --palette-gradient: linear-gradient(135deg, #DB2777 0%, #BE185D 100%);
+  --palette-call-button: #EC4899;
+  --palette-message-bg: #F472B6;
 }
 
 [data-theme='dark'] {
