@@ -116,6 +116,17 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
         'Last seen recently';
       const isGroupConversation = conversation.participants.length > 2;
       const currentUserAvatarUrl = currentUserProfile?.avatarUrl ?? null;
+
+      console.log('[buildViewConversation] Avatar Debug', {
+        conversationId: conversation.id,
+        displayTitle: counterpart?.displayName ?? conversation.title,
+        counterpartId,
+        counterpartFound: !!counterpart,
+        counterpartAvatarUrl: counterpart?.avatarUrl ?? 'null/undefined',
+        conversationAvatarUrl: conversation.avatarUrl ?? 'null/undefined',
+        currentUserAvatarUrl: currentUserAvatarUrl ?? 'null/undefined',
+        isGroupConversation,
+      });
       const displayAvatarUrl = isGroupConversation
         ? conversation.avatarUrl ?? null
         : counterpart?.avatarUrl ??
@@ -125,6 +136,13 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
           null;
       const displayAvatarColor =
         conversation.avatarColor ?? counterpart?.avatarColor ?? '#A8D0FF';
+
+      console.log('[buildViewConversation] Final Avatar Result', {
+        conversationId: conversation.id,
+        displayTitle: counterpart?.displayName ?? conversation.title,
+        finalDisplayAvatarUrl: displayAvatarUrl ?? 'null',
+        displayAvatarColor,
+      });
 
       return {
         ...conversation,

@@ -17,6 +17,14 @@ export const ConversationInfo: FC<ConversationInfoProps> = ({
   conversation,
   onContactClick,
 }) => {
+  console.log('[ConversationInfo] Top Bar Avatar', {
+    conversationId: conversation.id,
+    displayTitle: conversation.displayTitle,
+    displayAvatarUrl: conversation.displayAvatarUrl ?? 'null/undefined',
+    displayAvatarColor: conversation.displayAvatarColor,
+    counterpartId: conversation.counterpartId,
+  });
+
   const conversationInitials = conversation.displayTitle
     .split(' ')
     .map((part) => part[0])

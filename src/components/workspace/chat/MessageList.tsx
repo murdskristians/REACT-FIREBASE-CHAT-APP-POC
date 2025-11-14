@@ -62,8 +62,20 @@ export const MessageList: FC<MessageListProps> = ({ messages, currentUserId, isG
               new Date(message.createdAt).getTime() - new Date(prevMessage.createdAt).getTime() >
                 5 * 60 * 1000; // 5 minutes
 
-            // Get sender's profile from contactsMap for consistent avatar
             const senderProfile = contactsMap.get(message.senderId);
+
+            if (!isUserMessage) {
+              console.log('[MessageList] Message Avatar Debug', {
+                messageId: message.id,
+                senderId: message.senderId,
+                senderName: message.senderName,
+                senderProfileFound: !!senderProfile,
+                senderProfileDisplayName: senderProfile?.displayName ?? 'not found',
+                senderProfileAvatarUrl: senderProfile?.avatarUrl ?? 'null/undefined',
+                messageSenderAvatarUrl: message.senderAvatarUrl ?? 'null/undefined',
+                senderProfileAvatarColor: senderProfile?.avatarColor ?? 'not found',
+              });
+            }
 
             return (
               <MessageCard

@@ -103,11 +103,31 @@ export function ConversationList({
             conversation.avatarColor ??
             avatarFallbackPalette[index % avatarFallbackPalette.length];
 
-          const avatarUrl =
-            conversation.displayAvatarUrl ??
-            conversation.avatarUrl ??
-            counterpart?.avatarUrl ??
-            null;
+          const isGroupConversation = conversation.participants.length > 2;
+          const currentUserProfile = contactsMap.get(currentUserId);
+          const currentUserAvatarUrl = currentUserProfile?.avatarUrl ?? null;
+          const avatarUrl = isGroupConversation
+            ? conversation.displayAvatarUrl ?? conversation.avatarUrl ?? null
+            : conversation.displayAvatarUrl ??
+              (conversation.avatarUrl !== currentUserAvatarUrl
+                ? conversation.avatarUrl
+                : null) ??
+              counterpart?.avatarUrl ??
+              null;
+
+          console.log('[ConversationList] Avatar Debug', {
+            conversationId: conversation.id,
+            displayTitle: counterpart?.displayName ?? conversation.title,
+            counterpartId,
+            counterpartFound: !!counterpart,
+            counterpartAvatarUrl: counterpart?.avatarUrl ?? 'null/undefined',
+            conversationDisplayAvatarUrl:
+              conversation.displayAvatarUrl ?? 'null/undefined',
+            conversationAvatarUrl: conversation.avatarUrl ?? 'null/undefined',
+            currentUserAvatarUrl: currentUserAvatarUrl ?? 'null/undefined',
+            isGroupConversation,
+            finalAvatarUrl: avatarUrl ?? 'null',
+          });
 
           return (
             <li key={conversation.id}>
