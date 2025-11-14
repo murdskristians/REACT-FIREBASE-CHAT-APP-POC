@@ -12,6 +12,7 @@ export type Conversation = {
   avatarColor?: string | null;
   avatarUrl?: string | null;
   participants: string[];
+  type: 'private' | 'direct';
   updatedAt?: firebase.firestore.Timestamp | null;
   lastMessage?: ConversationMessagePreview | null;
 };
@@ -55,6 +56,7 @@ export function subscribeToConversations(
             avatarColor: data.avatarColor ?? null,
             avatarUrl: data.avatarUrl ?? null,
             participants: data.participants ?? [],
+            type: data.type ?? 'direct',
             updatedAt: data.updatedAt ?? null,
             lastMessage: data.lastMessage ?? null,
           } satisfies Conversation;
@@ -185,6 +187,7 @@ export async function ensureConversationExists({
       avatarColor,
       avatarUrl,
       participants: sortedParticipants,
+      type: 'direct',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       lastMessage: null,
@@ -194,5 +197,46 @@ export async function ensureConversationExists({
   } catch (error) {
     throw error;
   }
+}
+
+export async function ensureSavedMessagesConversationExists(
+  userId: string,
+  userDisplayName: string,
+  userAvatarColor: string,
+  userAvatarUrl: string | null
+): Promise<string> {
+  const existingConversationsSnapshot = await db
+    .collection(CONVERSATIONS_COLLECTION)
+    .where('participants', 'array-contains', userId)
+    .where('type', '==', 'private')
+    .get();
+
+  const existingPrivateConversation = existingConversationsSnapshot.docs.find(
+    (doc) => {
+      const data = doc.data();
+      return (
+        data.participants?.length === 1 &&
+        data.participants[0] === userId
+      );
+    }
+  );
+
+  if (existingPrivateConversation) {
+    return existingPrivateConversation.id;
+  }
+
+  const conversationRef = await db.collection(CONVERSATIONS_COLLECTION).add({
+    title: 'Saved Messages',
+    subtitle: null,
+    avatarColor: userAvatarColor,
+    avatarUrl: userAvatarUrl,
+    participants: [userId],
+    type: 'private',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    lastMessage: null,
+  });
+
+  return conversationRef.id;
 }
 

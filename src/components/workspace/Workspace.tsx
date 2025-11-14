@@ -97,6 +97,23 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
 
   const buildViewConversation = useCallback(
     (conversation: Conversation): ViewConversation => {
+      const isPrivateConversation = conversation.type === 'private';
+
+      if (isPrivateConversation) {
+        return {
+          ...conversation,
+          displayTitle: 'Saved Messages',
+          displaySubtitle: currentUserProfile?.status ?? 'Last seen recently',
+          displayAvatarUrl:
+            currentUserProfile?.avatarUrl ?? conversation.avatarUrl ?? null,
+          displayAvatarColor:
+            currentUserProfile?.avatarColor ??
+            conversation.avatarColor ??
+            '#A8D0FF',
+          counterpartId: user.uid,
+        };
+      }
+
       const counterpartId =
         conversation.participants.find((id) => id !== user.uid) ??
         conversation.participants[0] ??
@@ -156,9 +173,25 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
   );
 
   const viewConversations = useMemo<ViewConversation[]>(() => {
-    return conversations.map((conversation) =>
+    const mapped = conversations.map((conversation) =>
       buildViewConversation(conversation)
     );
+
+    return mapped.sort((a, b) => {
+      const aIsPrivate = a.type === 'private';
+      const bIsPrivate = b.type === 'private';
+
+      if (aIsPrivate && !bIsPrivate) {
+        return -1;
+      }
+      if (!aIsPrivate && bIsPrivate) {
+        return 1;
+      }
+
+      const aTime = a.updatedAt?.toMillis?.() ?? 0;
+      const bTime = b.updatedAt?.toMillis?.() ?? 0;
+      return bTime - aTime;
+    });
   }, [conversations, buildViewConversation]);
 
   const filteredConversations = useMemo(() => {
@@ -511,10 +544,8 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
               searchTerm={searchTerm}
               selectedConversationId={selectedConversationId}
               onSelectConversation={handleConversationSelect}
-              contactsMap={contactsMap}
-              currentUserId={user.uid}
               onAddConversation={() => {
-                // TODO: Implement add conversation functionality
+                setShowUserSearchModal(true);
               }}
             />
             <ChatView

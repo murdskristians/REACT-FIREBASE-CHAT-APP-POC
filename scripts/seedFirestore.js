@@ -62,6 +62,7 @@ const createConversation = async () => {
     participantKey: participants.join('_'),
     avatarColor: users[0].avatarColor,
     avatarUrl: null,
+    type: 'direct',
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     lastMessage: null,

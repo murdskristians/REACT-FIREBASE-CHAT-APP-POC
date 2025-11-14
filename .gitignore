@@ -27,3 +27,4 @@ coverage
 .cursor
 .claude/settings.local.json
 build/
+scripts/serviceAccountKey.json
