@@ -44,12 +44,16 @@ export const CallManager: FC<CallManagerProps> = ({
   useEffect(() => {
     if (!activeCall) return;
 
+    console.log('Subscribing to call session updates for:', activeCall.id);
+
     const unsubscribe = subscribeToCallSession(activeCall.id, (call) => {
       if (!call) {
+        console.log('Call session deleted');
         handleCallEnd();
         return;
       }
 
+      console.log('Call status updated:', call.status);
       setActiveCall(call);
 
       // Handle call ended by remote user
@@ -58,12 +62,16 @@ export const CallManager: FC<CallManagerProps> = ({
         call.status === 'declined' ||
         call.status === 'failed'
       ) {
+        console.log('Call ended by remote user');
         handleCallEnd();
       }
     });
 
-    return () => unsubscribe();
-  }, [activeCall?.id]);
+    return () => {
+      console.log('Unsubscribing from call session');
+      unsubscribe();
+    };
+  }, [activeCall?.id, handleCallEnd]);
 
   const handleAcceptCall = useCallback(
     async (call: CallSession) => {
@@ -106,18 +114,20 @@ export const CallManager: FC<CallManagerProps> = ({
     setIncomingCalls((prev) => prev.filter((c) => c.id !== call.id));
   }, []);
 
-  const handleEndCall = useCallback(async () => {
-    if (activeCall) {
-      await webrtcService.current.endCall();
-    }
-    handleCallEnd();
-  }, [activeCall]);
-
   const handleCallEnd = useCallback(() => {
+    console.log('Cleaning up call state');
     setActiveCall(null);
     setLocalStream(null);
     setRemoteStream(null);
   }, []);
+
+  const handleEndCall = useCallback(async () => {
+    console.log('Ending call');
+    if (activeCall) {
+      await webrtcService.current.endCall();
+    }
+    handleCallEnd();
+  }, [activeCall, handleCallEnd]);
 
   const handleToggleMute = useCallback((muted: boolean) => {
     webrtcService.current.toggleAudio(muted);
