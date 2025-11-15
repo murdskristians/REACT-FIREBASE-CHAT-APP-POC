@@ -6,6 +6,7 @@ import type { ConversationMessage, MessageReply } from '../../../firebase/conver
 import { getCurrentUser } from '../../../firebase/auth';
 import { Avatar } from '../shared/Avatar';
 import { ConversationMessagePopup } from './message-card/ConversationMessagePopup';
+import { ForwardedMessageTitle } from './message-card/ForwardedMessageTitle';
 import { MessageReactions } from './message-card/MessageReactions';
 import { Reply } from './message-card/reply/Reply';
 import {
@@ -28,6 +29,8 @@ interface MessageCardProps {
   isHighlighted?: boolean;
   onMessageDeleted?: () => void;
   onReply?: (replyTo: MessageReply) => void;
+  onForward?: (message: ConversationMessage) => void;
+  contactsMap?: Map<string, { displayName?: string | null; avatarUrl?: string | null; avatarColor?: string | null }>;
 }
 
 const initialPositionState = { top: 0, left: 0 };
@@ -49,6 +52,8 @@ export const MessageCard: FC<MessageCardProps> = ({
   isHighlighted = false,
   onMessageDeleted,
   onReply,
+  onForward,
+  contactsMap,
 }) => {
   const [isContextMenuOpened, setIsContextMenuOpened] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{ top: number; left: number }>(initialPositionState);
@@ -148,6 +153,18 @@ export const MessageCard: FC<MessageCardProps> = ({
                 </PuiTypography>
               )}
 
+              {message.forwardedFrom && (() => {
+                const forwardedContact = contactsMap?.get(message.forwardedFrom.originalSenderId);
+                return (
+                  <ForwardedMessageTitle
+                    forwardedFromName={message.forwardedFrom.originalSenderName || forwardedContact?.displayName || 'Unknown'}
+                    authorContactId={message.forwardedFrom.originalSenderId}
+                    authorAvatarUrl={forwardedContact?.avatarUrl ?? null}
+                    authorAvatarColor={forwardedContact?.avatarColor ?? null}
+                  />
+                );
+              })()}
+
               {message.replyTo && (() => {
                 const currentUserId = getCurrentUser()?.uid;
                 const isReplyFromCurrentUser = message.replyTo.senderId === currentUserId;
@@ -174,7 +191,16 @@ export const MessageCard: FC<MessageCardProps> = ({
                 );
               })()}
 
-              <TextMessage message={message} time={time} isUserMessage={isUserMessage} />
+              <TextMessage 
+                message={message.forwardedFrom ? {
+                  ...message,
+                  text: message.forwardedFrom.originalText,
+                  imageUrl: message.forwardedFrom.originalImageUrl,
+                  type: message.forwardedFrom.originalType,
+                } : message} 
+                time={time} 
+                isUserMessage={isUserMessage} 
+              />
               {message.reactions && message.reactions.length > 0 && (
                 <MessageReactions
                   reactions={message.reactions}
@@ -210,6 +236,7 @@ export const MessageCard: FC<MessageCardProps> = ({
         onMessageDeleted={onMessageDeleted}
         isOpenedFromRightClick={isOpenedFromRightClick}
         onReply={onReply}
+        onForward={onForward}
       />
     </>
   );

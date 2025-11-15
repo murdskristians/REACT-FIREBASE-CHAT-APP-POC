@@ -45,6 +45,17 @@ export type MessageReply = {
   createdAt?: firebase.firestore.Timestamp | null;
 };
 
+export type MessageForward = {
+  originalMessageId: string;
+  originalConversationId: string;
+  originalSenderId: string;
+  originalSenderName?: string | null;
+  originalText?: string | null;
+  originalImageUrl?: string | null;
+  originalType: 'text' | 'image';
+  originalCreatedAt?: firebase.firestore.Timestamp | null;
+};
+
 export type ConversationMessage = {
   id: string;
   senderId: string;
@@ -60,6 +71,7 @@ export type ConversationMessage = {
   pinnedAt?: firebase.firestore.Timestamp | null;
   reactions?: MessageReaction[];
   replyTo?: MessageReply | null;
+  forwardedFrom?: MessageForward | null;
 };
 
 export function subscribeToConversations(
@@ -138,6 +150,16 @@ export function subscribeToConversationMessages(
             type: data.replyTo.type ?? 'text',
             createdAt: data.replyTo.createdAt ?? null,
           } : null,
+          forwardedFrom: data.forwardedFrom ? {
+            originalMessageId: data.forwardedFrom.originalMessageId,
+            originalConversationId: data.forwardedFrom.originalConversationId,
+            originalSenderId: data.forwardedFrom.originalSenderId,
+            originalSenderName: data.forwardedFrom.originalSenderName ?? null,
+            originalText: data.forwardedFrom.originalText ?? null,
+            originalImageUrl: data.forwardedFrom.originalImageUrl ?? null,
+            originalType: data.forwardedFrom.originalType ?? 'text',
+            originalCreatedAt: data.forwardedFrom.originalCreatedAt ?? null,
+          } : null,
         } satisfies ConversationMessage;
       });
 
@@ -154,6 +176,7 @@ type SendMessageOptions = {
   text?: string;
   file?: File | null;
   replyTo?: MessageReply | null;
+  forwardedFrom?: MessageForward | null;
 };
 
 export async function sendMessage({
@@ -165,6 +188,7 @@ export async function sendMessage({
   text,
   file,
   replyTo,
+  forwardedFrom,
 }: SendMessageOptions): Promise<void> {
   const conversationRef = db.collection(CONVERSATIONS_COLLECTION).doc(conversationId);
   const messagesCollection = conversationRef.collection(MESSAGES_SUBCOLLECTION);
@@ -199,6 +223,16 @@ export async function sendMessage({
       type: replyTo.type,
       createdAt: replyTo.createdAt ?? null,
     } : null,
+    forwardedFrom: forwardedFrom ? {
+      originalMessageId: forwardedFrom.originalMessageId,
+      originalConversationId: forwardedFrom.originalConversationId,
+      originalSenderId: forwardedFrom.originalSenderId,
+      originalSenderName: forwardedFrom.originalSenderName ?? null,
+      originalText: forwardedFrom.originalText ?? null,
+      originalImageUrl: forwardedFrom.originalImageUrl ?? null,
+      originalType: forwardedFrom.originalType,
+      originalCreatedAt: forwardedFrom.originalCreatedAt ?? null,
+    } : null,
   });
 
   await conversationRef.set(
@@ -216,6 +250,87 @@ export async function sendMessage({
     },
     { merge: true }
   );
+}
+
+type ForwardMessageOptions = {
+  message: ConversationMessage;
+  originalConversationId: string;
+  targetConversationIds: string[];
+  forwardText?: string;
+  senderId: string;
+  senderName?: string | null;
+  senderAvatarUrl?: string | null;
+  senderAvatarColor?: string | null;
+  contactsMap: Map<string, { displayName?: string | null; email?: string | null; avatarColor?: string | null; avatarUrl?: string | null }>;
+};
+
+export async function forwardMessage({
+  message,
+  originalConversationId,
+  targetConversationIds,
+  forwardText,
+  senderId,
+  senderName,
+  senderAvatarUrl,
+  senderAvatarColor,
+  contactsMap,
+}: ForwardMessageOptions): Promise<void> {
+  if (targetConversationIds.length === 0) {
+    throw new Error('No target conversations specified');
+  }
+
+  // Create forward relation data
+  const forwardedFrom: MessageForward = {
+    originalMessageId: message.id,
+    originalConversationId: originalConversationId,
+    originalSenderId: message.senderId,
+    originalSenderName: message.senderName ?? null,
+    originalText: message.text ?? null,
+    originalImageUrl: message.imageUrl ?? null,
+    originalType: message.type,
+    originalCreatedAt: message.createdAt ?? null,
+  };
+
+  // Forward to each target conversation
+  for (const targetConversationId of targetConversationIds) {
+    // Check if conversation exists
+    const conversationRef = db.collection(CONVERSATIONS_COLLECTION).doc(targetConversationId);
+    const conversationDoc = await conversationRef.get();
+
+    let finalConversationId = targetConversationId;
+
+    // If conversation doesn't exist, it might be a contact ID - create a new conversation
+    if (!conversationDoc.exists) {
+      const contact = contactsMap.get(targetConversationId);
+      if (!contact) {
+        throw new Error(`Contact not found: ${targetConversationId}`);
+      }
+
+      // Create new conversation
+      const newConversationId = await ensureConversationExists({
+        participants: [senderId, targetConversationId],
+        title: contact.displayName ?? contact.email ?? 'Unknown',
+        subtitle: null,
+        avatarColor: contact.avatarColor ?? null,
+        avatarUrl: contact.avatarUrl ?? null,
+      });
+
+      finalConversationId = newConversationId;
+    }
+
+    // Send the forwarded message
+    await sendMessage({
+      conversationId: finalConversationId,
+      senderId,
+      senderName,
+      senderAvatarUrl,
+      senderAvatarColor,
+      text: forwardText?.trim() || null,
+      file: null,
+      replyTo: null,
+      forwardedFrom,
+    });
+  }
 }
 
 type EnsureConversationOptions = {

@@ -16,6 +16,7 @@ interface MessageListProps {
   highlightedMessageId?: string | null;
   onMessageDeleted?: () => void;
   onReply?: (replyTo: MessageReply) => void;
+  onForward?: (message: ConversationMessage) => void;
 }
 
 export const MessageList: FC<MessageListProps> = ({
@@ -29,6 +30,7 @@ export const MessageList: FC<MessageListProps> = ({
   highlightedMessageId,
   onMessageDeleted,
   onReply,
+  onForward,
 }) => {
   const listRef = useRef<HTMLDivElement | null>(null);
 
@@ -117,6 +119,8 @@ export const MessageList: FC<MessageListProps> = ({
                 isHighlighted={highlightedMessageId === message.id}
                 onMessageDeleted={onMessageDeleted}
                 onReply={onReply}
+                onForward={onForward}
+                contactsMap={contactsMap}
               />
             );
           })

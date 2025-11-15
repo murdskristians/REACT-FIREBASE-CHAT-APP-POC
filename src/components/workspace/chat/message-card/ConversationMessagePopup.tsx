@@ -32,6 +32,7 @@ interface ConversationMessagePopupProps {
   onMessageDeleted?: () => void;
   isOpenedFromRightClick: boolean;
   onReply?: (replyTo: MessageReply) => void;
+  onForward?: (message: ConversationMessage) => void;
 }
 
 export const ConversationMessagePopup: FC<ConversationMessagePopupProps> = ({
@@ -47,6 +48,7 @@ export const ConversationMessagePopup: FC<ConversationMessagePopupProps> = ({
   onMessageDeleted,
   isOpenedFromRightClick,
   onReply,
+  onForward,
 }) => {
   const [activeOption, setActiveOption] = useState<MessagePopupItemType | null>(
     null
@@ -178,6 +180,13 @@ export const ConversationMessagePopup: FC<ConversationMessagePopupProps> = ({
     onClose();
   };
 
+  const handleForward = () => {
+    if (message && onForward) {
+      onForward(message);
+    }
+    onClose();
+  };
+
   // Popup options with real functionality
   const popupOptions: MessagePopupItemType[] = [
     { label: 'Reply', icon: PuiIcon.CornerUpRight, onClick: handleReply },
@@ -192,7 +201,7 @@ export const ConversationMessagePopup: FC<ConversationMessagePopupProps> = ({
       onClick: handleCopyText,
       disabled: !messageText,
     },
-    { label: 'Forward', icon: PuiIcon.FlipBackward, onClick: () => {} },
+    { label: 'Forward', icon: PuiIcon.FlipBackward, onClick: handleForward },
     {
       label: 'Delete',
       icon: PuiIcon.Trash,

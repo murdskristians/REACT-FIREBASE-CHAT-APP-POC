@@ -12,8 +12,10 @@ import { UserSearchModal } from './UserSearchModal';
 import { createViewConversationFromContact as createViewConversationFromContactUtil } from './utils';
 import { ContactCardView } from './contact/ContactCardView';
 import { CreateNewGroupPanel } from './group/CreateNewGroupPanel';
+import { ForwardMessageModal } from './chat/ForwardMessageModal';
 import {
   ensureConversationExists,
+  forwardMessage,
   sendMessage,
   subscribeToConversationMessages,
   subscribeToConversations,
@@ -79,6 +81,8 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
     null
   );
   const [showCreateGroupPanel, setShowCreateGroupPanel] = useState(false);
+  const [messageToForward, setMessageToForward] = useState<ConversationMessage | null>(null);
+  const [isForwarding, setIsForwarding] = useState(false);
 
   const contactsMap = useMemo(() => {
     const map = new Map<string, Contact>();
@@ -609,6 +613,50 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
     }
   };
 
+  const handleForwardMessage = async (
+    message: ConversationMessage,
+    targetConversationIds: string[],
+    forwardText?: string
+  ) => {
+    if (!activeConversationState.conversation) {
+      throw new Error('No active conversation');
+    }
+
+    setIsForwarding(true);
+    try {
+      const userProfile = contactsMap.get(user.uid);
+      const contactsMapForForward = new Map(
+        Array.from(contactsMap.entries()).map(([id, contact]) => [
+          id,
+          {
+            displayName: contact.displayName,
+            email: contact.email,
+            avatarColor: contact.avatarColor,
+            avatarUrl: contact.avatarUrl,
+          },
+        ])
+      );
+
+      await forwardMessage({
+        message,
+        originalConversationId: activeConversationState.conversation.id,
+        targetConversationIds,
+        forwardText,
+        senderId: user.uid,
+        senderName:
+          userProfile?.displayName ??
+          user.displayName ??
+          user.email ??
+          'Unknown user',
+        senderAvatarUrl: userProfile?.avatarUrl ?? user.photoURL ?? null,
+        senderAvatarColor: userProfile?.avatarColor ?? '#A8D0FF',
+        contactsMap: contactsMapForForward,
+      });
+    } finally {
+      setIsForwarding(false);
+    }
+  };
+
   return (
     <MuiThemeProvider theme={theme}>
       <div className="workspace">
@@ -648,6 +696,10 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
               contactsMap={contactsMap}
               pendingUser={pendingUser}
               onContactClick={handleContactClick}
+              conversations={conversations}
+              contacts={contacts}
+              onForwardMessage={handleForwardMessage}
+              onForward={setMessageToForward}
             />
             {selectedContact && selectedContactId ? (
               <ContactCardView
@@ -661,6 +713,20 @@ export function Workspace({ user, onSignOut }: WorkspaceProps) {
                 contacts={contacts}
                 onCreateGroup={handleGroupCreated}
                 onClose={handleCloseCreateGroupPanel}
+              />
+            ) : messageToForward ? (
+              <ForwardMessageModal
+                open={true}
+                onClose={() => setMessageToForward(null)}
+                message={messageToForward}
+                conversations={conversations}
+                contacts={contacts}
+                currentUserId={user.uid}
+                onForward={async (targetConversationIds: string[], forwardText?: string) => {
+                  await handleForwardMessage(messageToForward, targetConversationIds, forwardText);
+                  setMessageToForward(null);
+                }}
+                isLoading={isForwarding}
               />
             ) : (
               <AiPanel />
