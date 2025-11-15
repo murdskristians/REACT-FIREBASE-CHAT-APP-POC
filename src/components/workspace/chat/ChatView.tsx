@@ -3,7 +3,7 @@ import type firebaseCompat from 'firebase/compat/app';
 
 import { PuiStack, PuiTypography } from 'piche.ui';
 
-import type { ConversationMessage, MessageReply } from '../../../firebase/conversations';
+import type { ConversationMessage, MessageReply, Conversation } from '../../../firebase/conversations';
 import type { Contact } from '../../../firebase/users';
 import type { ViewConversation } from '../Workspace';
 import { createViewConversationFromContact } from '../utils';
@@ -26,6 +26,10 @@ type ChatViewProps = {
   contactsMap: Map<string, Contact>;
   pendingUser?: Contact | null;
   onContactClick?: () => void;
+  conversations: Conversation[];
+  contacts: Contact[];
+  onForwardMessage: (message: ConversationMessage, targetConversationIds: string[], forwardText?: string) => Promise<void>;
+  onForward: (message: ConversationMessage) => void;
 };
 
 export function ChatView({
@@ -37,6 +41,10 @@ export function ChatView({
   contactsMap,
   pendingUser,
   onContactClick,
+  conversations,
+  contacts,
+  onForwardMessage,
+  onForward,
 }: ChatViewProps) {
   const [composerValue, setComposerValue] = useState('');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -128,6 +136,10 @@ export function ChatView({
     }
   };
 
+  const handleForward = (message: ConversationMessage) => {
+    onForward(message);
+  };
+
   return (
     <ChatAreaWrapper>
       <ConversationTopBar
@@ -173,6 +185,7 @@ export function ChatView({
               // Messages will automatically update via Firestore subscription
             }}
             onReply={setReplyTo}
+            onForward={handleForward}
           />
         )}
       </MessagesContainer>
