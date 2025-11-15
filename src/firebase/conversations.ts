@@ -64,7 +64,8 @@ export type ConversationMessage = {
   senderAvatarColor?: string | null;
   text?: string | null;
   imageUrl?: string | null;
-  type: 'text' | 'image';
+  fileUrls?: string[] | null;
+  type: 'text' | 'image' | 'file';
   createdAt?: firebase.firestore.Timestamp | null;
   isPinned?: boolean;
   pinnedBy?: string | null;
@@ -130,6 +131,7 @@ export function subscribeToConversationMessages(
           senderAvatarColor: data.senderAvatarColor ?? null,
           text: data.text ?? null,
           imageUrl: data.imageUrl ?? null,
+          fileUrls: data.fileUrls ?? null,
           type: data.type ?? 'text',
           createdAt: data.createdAt ?? null,
           isPinned: data.isPinned ?? false,
@@ -175,6 +177,7 @@ type SendMessageOptions = {
   senderAvatarColor?: string | null;
   text?: string;
   file?: File | null;
+  files?: File[];
   replyTo?: MessageReply | null;
   forwardedFrom?: MessageForward | null;
 };
@@ -187,6 +190,7 @@ export async function sendMessage({
   senderAvatarColor,
   text,
   file,
+  files,
   replyTo,
   forwardedFrom,
 }: SendMessageOptions): Promise<void> {
@@ -196,11 +200,26 @@ export async function sendMessage({
   const messageRef = messagesCollection.doc();
 
   let uploadedImageUrl: string | undefined;
-  let messageType: 'text' | 'image' = 'text';
+  let uploadedFileUrls: string[] = [];
+  let messageType: 'text' | 'image' | 'file' = 'text';
 
-  if (file) {
-    uploadedImageUrl = await uploadConversationAttachment(conversationId, messageRef.id, file);
-    messageType = 'image';
+  // Support legacy single file parameter
+  const filesToUpload = files || (file ? [file] : []);
+
+  if (filesToUpload.length > 0) {
+    // Upload all files
+    uploadedFileUrls = await Promise.all(
+      filesToUpload.map(f => uploadConversationAttachment(conversationId, messageRef.id, f))
+    );
+    
+    // Determine message type based on first file
+    const firstFile = filesToUpload[0];
+    if (firstFile.type.startsWith('image/')) {
+      messageType = 'image';
+      uploadedImageUrl = uploadedFileUrls[0]; // For backward compatibility
+    } else {
+      messageType = 'file';
+    }
   }
 
   const trimmedText = text?.trim();
@@ -212,6 +231,7 @@ export async function sendMessage({
     senderAvatarColor: senderAvatarColor ?? null,
     text: trimmedText ?? null,
     imageUrl: uploadedImageUrl ?? null,
+    fileUrls: uploadedFileUrls.length > 0 ? uploadedFileUrls : null,
     type: messageType,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     replyTo: replyTo ? {

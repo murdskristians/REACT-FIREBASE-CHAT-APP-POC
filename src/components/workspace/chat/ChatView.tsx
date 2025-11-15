@@ -12,6 +12,7 @@ import { ConversationTopBar } from './ConversationTopBar';
 import { MessageList } from './MessageList';
 import { PinnedMessages } from './PinnedMessages';
 import { ChatAreaWrapper, MessagesContainer } from './StyledComponents';
+import type { FilePreviewItem } from './file-preview/FilesInputArea';
 
 type ChatViewProps = {
   user: firebaseCompat.User;
@@ -19,7 +20,7 @@ type ChatViewProps = {
   messages: ConversationMessage[];
   onSendMessage: (payload: {
     text: string;
-    file?: File | null;
+    files?: File[];
     replyTo?: MessageReply | null;
   }) => Promise<void>;
   isSending: boolean;
@@ -47,14 +48,14 @@ export function ChatView({
   onForward,
 }: ChatViewProps) {
   const [composerValue, setComposerValue] = useState('');
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<FilePreviewItem[]>([]);
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<MessageReply | null>(null);
 
   useEffect(() => {
     if (!conversation) {
       setComposerValue('');
-      setPendingFile(null);
+      setPendingFiles([]);
       setReplyTo(null);
     }
   }, [conversation]);
@@ -62,7 +63,7 @@ export function ChatView({
   useEffect(() => {
     if (!messages.length) {
       setComposerValue('');
-      setPendingFile(null);
+      setPendingFiles([]);
     }
   }, [messages]);
 
@@ -74,14 +75,15 @@ export function ChatView({
     }
 
     const text = composerValue.trim();
-    if (!text && !pendingFile) {
+    if (!text && pendingFiles.length === 0) {
       return;
     }
 
-    await onSendMessage({ text, file: pendingFile, replyTo });
+    const files = pendingFiles.map(f => f.file);
+    await onSendMessage({ text, files: files.length > 0 ? files : undefined, replyTo });
 
     setComposerValue('');
-    setPendingFile(null);
+    setPendingFiles([]);
     setReplyTo(null);
   };
 
@@ -194,8 +196,8 @@ export function ChatView({
         conversationTitle={displayConversation.displayTitle}
         composerValue={composerValue}
         setComposerValue={setComposerValue}
-        pendingFile={pendingFile}
-        setPendingFile={setPendingFile}
+        pendingFiles={pendingFiles}
+        setPendingFiles={setPendingFiles}
         onSubmit={handleSubmit}
         isSending={isSending}
         onSendMessage={onSendMessage}
