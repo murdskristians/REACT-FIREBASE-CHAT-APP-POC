@@ -1,17 +1,14 @@
 import {
   PuiAvatar,
   PuiBox,
-  PuiButton,
   PuiIcon,
   PuiIconButton,
   PuiLoadingButton,
   PuiStack,
   PuiSvgIcon,
   PuiSwitch,
-  PuiTextInput,
   PuiTypography,
   PuiStyled,
-  useTheme,
 } from 'piche.ui';
 import { useState, type FC, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
@@ -139,7 +136,6 @@ export const ForwardMessageModal: FC<ForwardMessageModalProps> = ({
   onForward,
   isLoading = false,
 }) => {
-  const theme = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedConversationIds, setSelectedConversationIds] = useState<string[]>([]);
   const [forwardText, setForwardText] = useState('');
