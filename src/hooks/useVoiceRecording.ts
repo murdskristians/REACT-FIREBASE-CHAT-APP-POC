@@ -65,7 +65,31 @@ export const useVoiceRecording = () => {
         setDuration(milliseconds);
 
         if (milliseconds >= MAX_VOICE_DURATION_MS) {
-          stopRecording(true);
+          // Stop recording directly without calling stopRecording to avoid dependency issues
+          if (mediaRecorderRef.current) {
+            mediaRecorderRef.current.onstop = () => {
+              const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+              setAudioBlob(audioBlob);
+            };
+            mediaRecorderRef.current.stop();
+          }
+          
+          if (durationIntervalRef.current) {
+            clearInterval(durationIntervalRef.current);
+            durationIntervalRef.current = null;
+          }
+
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+          }
+
+          if (audioContextRef.current) {
+            audioContextRef.current.close();
+            audioContextRef.current = null;
+          }
+
+          setIsRecording(false);
           return;
         }
 

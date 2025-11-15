@@ -32,6 +32,7 @@ interface ConversationInputProps {
   onSendMessage: (payload: { text: string; files?: File[]; audio?: { blob: Blob; duration: number; volumeLevels: number[] } }) => Promise<void>;
   replyTo?: MessageReply | null;
   onReplyToChange?: (replyTo: MessageReply | null) => void;
+  onAudioSent?: () => void;
 }
 
 export function ConversationInput({
@@ -43,6 +44,7 @@ export function ConversationInput({
   pendingAudio,
   onRecordingComplete,
   onRemoveAudio,
+  onAudioSent,
   onSubmit,
   isSending,
   onSendMessage,
@@ -92,6 +94,7 @@ export function ConversationInput({
     const text = composerValue.trim();
     if (!text && pendingFiles.length === 0 && !pendingAudio) return;
     const files = pendingFiles.map(f => f.file);
+    const hasAudio = !!pendingAudio;
     await onSendMessage({ 
       text, 
       files: files.length > 0 ? files : undefined,
@@ -99,7 +102,10 @@ export function ConversationInput({
     });
     setComposerValue('');
     setPendingFiles([]);
-    // Audio cleanup is handled by parent component
+    // Clear audio after sending
+    if (hasAudio && onAudioSent) {
+      onAudioSent();
+    }
   };
 
   return (

@@ -240,6 +240,7 @@ export function ChatView({
         pendingAudio={pendingAudio}
         onRecordingComplete={handleRecordingComplete}
         onRemoveAudio={handleRemoveAudio}
+        onAudioSent={handleRemoveAudio}
         onSubmit={handleSubmit}
         isSending={isSending}
         onSendMessage={onSendMessage}
