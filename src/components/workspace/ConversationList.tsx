@@ -6,7 +6,9 @@ import { PuiIcon, PuiIconButton, PuiSvgIcon, PuiStyled } from 'piche.ui';
 import { Avatar } from './shared/Avatar';
 import type { ViewConversation } from './Workspace';
 
-const StyledPlusButton = PuiStyled(PuiIconButton)<{ isOpen: boolean }>(
+const StyledPlusButton = PuiStyled(PuiIconButton, {
+  shouldForwardProp: (propName) => propName !== 'isOpen',
+})<{ isOpen: boolean }>(
   ({ isOpen }) => ({
     width: '24px',
     height: '24px',

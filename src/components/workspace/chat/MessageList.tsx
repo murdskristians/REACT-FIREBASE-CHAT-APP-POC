@@ -13,6 +13,7 @@ interface MessageListProps {
   conversationAvatarColor?: string | null;
   counterpartId?: string;
   conversationId: string;
+  highlightedMessageId?: string | null;
   onMessageDeleted?: () => void;
 }
 
@@ -24,6 +25,7 @@ export const MessageList: FC<MessageListProps> = ({
   conversationAvatarColor,
   counterpartId,
   conversationId,
+  highlightedMessageId,
   onMessageDeleted,
 }) => {
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -110,6 +112,7 @@ export const MessageList: FC<MessageListProps> = ({
                 senderAvatarColor={!isUserMessage ? avatarColor : undefined}
                 isGroup={isGroup}
                 conversationId={conversationId}
+                isHighlighted={highlightedMessageId === message.id}
                 onMessageDeleted={onMessageDeleted}
               />
             );
