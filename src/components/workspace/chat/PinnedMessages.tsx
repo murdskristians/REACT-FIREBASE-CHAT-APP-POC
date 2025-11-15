@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { PuiIcon, PuiStack, PuiSvgIcon, PuiTypography, useTheme } from 'piche.ui';
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 

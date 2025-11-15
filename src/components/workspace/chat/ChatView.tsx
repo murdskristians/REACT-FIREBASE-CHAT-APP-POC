@@ -80,7 +80,9 @@ export function ChatView({
 
   // Show empty state for pending conversations
   const isPendingConversation = displayConversation?.id === 'pending';
-  const displayMessages = isPendingConversation ? [] : messages;
+  const displayMessages = useMemo(() => {
+    return isPendingConversation ? [] : messages;
+  }, [isPendingConversation, messages]);
 
   // All hooks must be called before any early return
   const pinnedMessages = useMemo(() => {
