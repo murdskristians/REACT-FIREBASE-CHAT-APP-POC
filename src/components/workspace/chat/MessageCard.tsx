@@ -22,6 +22,7 @@ interface MessageCardProps {
   senderAvatarColor?: string;
   isGroup?: boolean;
   conversationId: string;
+  isHighlighted?: boolean;
   onMessageDeleted?: () => void;
 }
 
@@ -41,6 +42,7 @@ export const MessageCard: FC<MessageCardProps> = ({
   senderAvatarColor,
   isGroup = false,
   conversationId,
+  isHighlighted = false,
   onMessageDeleted,
 }) => {
   const [isContextMenuOpened, setIsContextMenuOpened] = useState(false);
@@ -114,12 +116,15 @@ export const MessageCard: FC<MessageCardProps> = ({
                 gap: '8px',
                 borderRadius: isUserMessage ? '16px 0 16px 16px' : '0px 16px 16px 16px',
                 padding: '8px 16px',
-                background: isUserMessage ? 'var(--palette-message-bg)' : '#ffffff',
+                background: isHighlighted 
+                  ? (isUserMessage ? '#B3D9F2' : '#E3F2FD') 
+                  : (isUserMessage ? 'var(--palette-message-bg)' : '#ffffff'),
                 color: isUserMessage ? '#1f2131' : '#1f2131',
                 position: 'relative',
                 overflow: 'hidden',
                 justifyContent: 'start',
                 maxWidth: '100%',
+                transition: 'background-color 0.3s ease-in-out',
               }}
             >
               {!isUserMessage && senderName && isGroup && (

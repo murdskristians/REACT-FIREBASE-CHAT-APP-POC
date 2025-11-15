@@ -11,6 +11,21 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Helper function to check if user is participant of the conversation
+    function isConversationParticipant(conversationId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/conversations/$(conversationId)) &&
+             request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+    }
+
+    // Helper function to check if only pin fields are being updated
+    function isOnlyPinFieldsUpdate() {
+      let changedKeys = request.resource.data.diff(resource.data).affectedKeys();
+      // Check that critical fields are not being changed
+      // Only pin-related fields (isPinned, pinnedBy, pinnedAt) should be allowed
+      return !changedKeys.hasAny(['senderId', 'senderName', 'senderAvatarUrl', 'senderAvatarColor', 'text', 'imageUrl', 'type', 'createdAt']);
+    }
+
     // Users collection
     match /users/{userId} {
       allow read: if isAuthenticated();
@@ -28,7 +43,15 @@ service cloud.firestore {
       match /messages/{messageId} {
         allow read: if isAuthenticated();
         allow create: if isAuthenticated();
-        allow update, delete: if isAuthenticated() && request.auth.uid == resource.data.senderId;
+        // Allow update if:
+        // 1. User is updating only pin fields AND is a conversation participant, OR
+        // 2. User is the sender of the message (can update any fields)
+        allow update: if isAuthenticated() && (
+          (isOnlyPinFieldsUpdate() && isConversationParticipant(conversationId)) ||
+          request.auth.uid == resource.data.senderId
+        );
+        // Allow delete only if user is the sender
+        allow delete: if isAuthenticated() && request.auth.uid == resource.data.senderId;
       }
     }
 

@@ -39,6 +39,7 @@ export function ChatView({
 }: ChatViewProps) {
   const [composerValue, setComposerValue] = useState('');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!conversation) {
@@ -112,6 +113,14 @@ export function ChatView({
     const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
     if (messageElement) {
       messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Highlight the message
+      setHighlightedMessageId(messageId);
+      
+      // Remove highlight after 2 seconds
+      setTimeout(() => {
+        setHighlightedMessageId(null);
+      }, 2000);
     }
   };
 
@@ -155,6 +164,7 @@ export function ChatView({
             conversationAvatarColor={displayConversation.displayAvatarColor}
             counterpartId={displayConversation.counterpartId}
             conversationId={displayConversation.id}
+            highlightedMessageId={highlightedMessageId}
             onMessageDeleted={() => {
               // Messages will automatically update via Firestore subscription
             }}
